@@ -1,0 +1,21 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=D8:BA:AA:66:7F:B8:A0:92:89:1E:CA:A1:51:EF:BB:B6:6D:71:8D:28%3Bcom.example.ninasmacpro.mavigation
+
+    You can also add your credentials to an existing key, using this line:
+    D8:BA:AA:66:7F:B8:A0:92:89:1E:CA:A1:51:EF:BB:B6:6D:71:8D:28;com.example.ninasmacpro.mavigation
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        YOUR_KEY_HERE
+    </string>
+</resources>
