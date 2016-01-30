@@ -9,28 +9,47 @@
     android:orientation="vertical"
     android:background="#FFFFFF"
     tools:context="com.example.ninasmacpro.mavigation.MainActivity">
-    <LinearLayout
+
+    <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_margin="10dp"
+        android:layout_centerHorizontal="true">
 
-        <Button
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/buttonTest"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/buttonLogIn"
-            android:onClick="onButtonLogIn"/>
+            android:gravity="center"
+            android:text="Mavigation"
+            android:textColor="#3c7e1d"
+            android:layout_centerHorizontal="true"
+            android:textSize="32sp"/>
 
-        <Button
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/buttonStopTest"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/buttonSignUp"
-            android:onClick="onButtonSignUp"/>
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" >
 
-    </LinearLayout>
+            <Button
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/buttonTest"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/buttonLogIn"
+                android:onClick="onButtonLogIn" />
+
+            <Button
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/buttonStopTest"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/buttonSignUp"
+                android:onClick="onButtonSignUp"/>
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </LinearLayout>

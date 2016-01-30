@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
@@ -88,7 +89,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 int x = 1;
-                //attemptLogin();
+                attemptLogin();
             }
         });
 
@@ -137,11 +138,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 populateAutoComplete();
             }
         }
-    }
-
-    public void onButtonTryLogIn(View view) {
-        Intent mapIntent = new Intent(this, MapsActivity.class);
-        startActivity(mapIntent);
     }
 
 
@@ -332,7 +328,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
 
             // TODO: register the new account here.
-            return true;
+            return false;
         }
 
         @Override
@@ -342,6 +338,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 finish();
+                Intent mapIntent = new Intent(LoginActivity.this, MapsActivity.class);
+                startActivity(mapIntent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
