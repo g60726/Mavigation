@@ -56,7 +56,8 @@
 
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login">
+            android:label="@string/title_activity_login"
+            android:parentActivityName=".MainActivity">
 
         </activity>
 
@@ -75,7 +76,8 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps">
+        </activity>
     </application>
 
 </manifest>

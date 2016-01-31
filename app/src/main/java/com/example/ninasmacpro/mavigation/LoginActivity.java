@@ -338,11 +338,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 finish();
-                //Intent mapIntent = new Intent(LoginActivity.this, MapsActivity.class);
-                //startActivity(mapIntent);
-                final Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse("http://maps.google.com/maps?" + "saddr="+ -34 + "," + 151 + "&daddr=" + -32 + "," + 151));
-                intent.setClassName("com.google.android.apps.maps","com.google.android.maps.MapsActivity");
-                startActivity(intent);
+                Intent mapIntent = new Intent(LoginActivity.this, MapsActivity.class);
+                startActivity(mapIntent);
+                //final Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse("http://maps.google.com/maps?" + "saddr="+ -34 + "," + 151 + "&daddr=" + -32 + "," + 151));
+                //intent.setClassName("com.google.android.apps.maps","com.google.android.maps.MapsActivity");
+                //startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
