@@ -20,4 +20,11 @@
         completions."
     </string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_sign_up">Sign Up</string>
+    <string name="prompt_sign_up_email">Email</string>
+    <string name="prompt_sign_up_password">Password</string>
+    <string name="prompt_sign_up_rpassword">Retype Password</string>
+    <string name="action_sign_up_short">Register</string>
+    <string name="prompt_sign_up_nick_name">Nick Name</string>
+    <string name="action_sign_up">Sign Up</string>
 </resources>
