@@ -44,6 +44,14 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <!-- application id and client key for Parse -->
+        <meta-data
+            android:name="com.parse.APPLICATION_ID"
+            android:value="alYxBJO2AKZmCiLDGokhKqcQKCIgt3R1m3jqddTQ" />
+        <meta-data
+            android:name="com.parse.CLIENT_KEY"
+            android:value="zcFlMs6YsaLTLzcS0wLpRTMhDSH9p3xln0JgXJjn" />
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
