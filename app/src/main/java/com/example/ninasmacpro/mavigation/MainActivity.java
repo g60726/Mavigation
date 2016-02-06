@@ -21,8 +21,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // connect to Parse
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this);
+        //Parse.enableLocalDatastore(this);
+        //Parse.initialize(this);
 
         /*
         ParseObject testObject = new ParseObject("TestObject");
