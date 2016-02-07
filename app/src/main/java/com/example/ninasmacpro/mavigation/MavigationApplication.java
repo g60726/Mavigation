@@ -19,7 +19,6 @@ public class MavigationApplication extends Application {
         super.onCreate();
         Parse.enableLocalDatastore(this);
         Parse.initialize(this);
-        //Parse.initialize(this, "YOUR_PARSE_APPLICATION_ID", "YOUR_PARSE_CLIENT_KEY");
     }
 
 }

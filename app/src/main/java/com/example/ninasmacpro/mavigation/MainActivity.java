@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** JUmp to SignUpActivity */
     public void onButtonSignUp(View view) {
-        Intent aboutIntent = new Intent(this, LoginActivity.class);
+        Intent aboutIntent = new Intent(this, SignUpActivity.class);
         startActivity(aboutIntent);
     }
 

@@ -18,66 +18,69 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
-/**
- * A login screen that offers login via email/password.
- */
-public class LoginActivity extends AppCompatActivity { //implements LoaderCallbacks<Cursor> {
-    private static final String TAG = "LoginActivity";
+public class SignUpActivity extends AppCompatActivity {
+    private static final String TAG = "SignUpActivity";
 
     // UI references.
     private EditText mEmailView;
     private EditText mPasswordView;
+    private EditText mRetypePasswordView;
+    private EditText mNickNameView;
     private View mProgressView;
-    private View mLoginFormView;
-
+    private View mSignUpFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_sign_up);
 
-        // Set up the login form.
-        mEmailView = (EditText) findViewById(R.id.email);
+        // Set up the sign up form.
+        mEmailView = (EditText) findViewById(R.id.sign_up_email);
+        mPasswordView = (EditText) findViewById(R.id.sign_up_password);
+        mRetypePasswordView = (EditText) findViewById(R.id.sign_up_rpassword);
+        mNickNameView = (EditText) findViewById(R.id.sign_up_nick_name);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                if (id == R.id.signup || id == EditorInfo.IME_NULL) {
+                    attemptSignUp();
                     return true;
                 }
                 return false;
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
+        mEmailSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                int x = 1;
+                attemptSignUp();
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+        mSignUpFormView = findViewById(R.id.sign_up_form);
+        mProgressView = findViewById(R.id.sign_up_progress);
     }
 
     /**
-     * Attempts to log in the account specified by the login form.
+     * Attempts to sign in the account specified by the sign up form.
      */
-    private void attemptLogin() {
+    private void attemptSignUp() {
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
+        // Store values at the time of the sign up attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String retypePassword = mRetypePasswordView.getText().toString();
+        String nickName = mNickNameView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -100,27 +103,49 @@ public class LoginActivity extends AppCompatActivity { //implements LoaderCallba
             cancel = true;
         }
 
+        // check if password = retyped password
+        if (!password.equals(retypePassword)) {
+            log(password);
+            log(retypePassword);
+            mRetypePasswordView.setError("passwords don't match!");
+            focusView = mRetypePasswordView;
+            cancel = true;
+        }
+
+        // must enter a nick name
+        if (TextUtils.isEmpty(nickName)) {
+            mNickNameView.setError("Must enter a nick name!");
+            focusView = mNickNameView;
+            cancel = true;
+        }
+
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
+            // There was an error; don't attempt sign up and focus the first
             // form field with an error.
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the user sign up attempt.
             showProgress(true);
 
-            ParseUser.logInInBackground(email, password, new LogInCallback() {
-                public void done(ParseUser user, ParseException e) {
-                    if (user != null) {
-                        // Hooray! The user is logged in.
+            ParseUser user = new ParseUser();
+            user.setEmail(email);
+            user.setUsername(email); //user name is the same as email, and is unique
+            user.setPassword(password);
+            user.put("nickName", nickName);
+
+            user.signUpInBackground(new SignUpCallback() {
+                public void done(ParseException e) {
+                    if (e == null) {
+                        // Hooray! Let them use the app now.
                         finish();
-                        Intent mapIntent = new Intent(LoginActivity.this, MapsActivity.class);
+                        Intent mapIntent = new Intent(SignUpActivity.this, MapsActivity.class);
                         startActivity(mapIntent);
                     } else {
-                        // login failed. Look at the ParseException to see what happened.
+                        // Sign up didn't succeed. Look at the ParseException to figure out what went wrong
                         showProgress(false);
-                        log("Invalid user name or password!");
-                        mEmailView.setError("Invalid user name or password!");
+                        log("Invalid user name or email!");
+                        mEmailView.setError("Invalid user name or email!");
                         mEmailView.requestFocus();
                     }
                 }
@@ -141,7 +166,7 @@ public class LoginActivity extends AppCompatActivity { //implements LoaderCallba
     }
 
     /**
-     * Shows the progress UI and hides the login form.
+     * Shows the progress UI and hides the sign up form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
@@ -151,12 +176,12 @@ public class LoginActivity extends AppCompatActivity { //implements LoaderCallba
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+            mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mSignUpFormView.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
 
@@ -172,7 +197,7 @@ public class LoginActivity extends AppCompatActivity { //implements LoaderCallba
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -181,4 +206,3 @@ public class LoginActivity extends AppCompatActivity { //implements LoaderCallba
     }
 
 }
-
