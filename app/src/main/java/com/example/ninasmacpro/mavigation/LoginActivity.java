@@ -119,8 +119,8 @@ public class LoginActivity extends AppCompatActivity { //implements LoaderCallba
                     } else {
                         // login failed. Look at the ParseException to see what happened.
                         showProgress(false);
-                        log("Invalid user name or password!");
-                        mEmailView.setError("Invalid user name or password!");
+                        log("Invalid email or password!");
+                        mEmailView.setError("Invalid email or password!");
                         mEmailView.requestFocus();
                     }
                 }

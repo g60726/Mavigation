@@ -144,8 +144,8 @@ public class SignUpActivity extends AppCompatActivity {
                     } else {
                         // Sign up didn't succeed. Look at the ParseException to figure out what went wrong
                         showProgress(false);
-                        log("Invalid user name or email!");
-                        mEmailView.setError("Invalid user name or email!");
+                        log("Invalid email!");
+                        mEmailView.setError("Invalid email!");
                         mEmailView.requestFocus();
                     }
                 }
