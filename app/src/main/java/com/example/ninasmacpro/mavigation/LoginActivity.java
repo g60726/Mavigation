@@ -114,7 +114,7 @@ public class LoginActivity extends AppCompatActivity { //implements LoaderCallba
                     if (user != null) {
                         // Hooray! The user is logged in.
                         finish();
-                        Intent mapIntent = new Intent(LoginActivity.this, MapsActivity.class);
+                        Intent mapIntent = new Intent(LoginActivity.this, SettingActivity.class);
                         startActivity(mapIntent);
                     } else {
                         // login failed. Look at the ParseException to see what happened.

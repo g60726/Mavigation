@@ -139,7 +139,7 @@ public class SignUpActivity extends AppCompatActivity {
                     if (e == null) {
                         // Hooray! Let them use the app now.
                         finish();
-                        Intent mapIntent = new Intent(SignUpActivity.this, MapsActivity.class);
+                        Intent mapIntent = new Intent(SignUpActivity.this, SettingActivity.class);
                         startActivity(mapIntent);
                     } else {
                         // Sign up didn't succeed. Look at the ParseException to figure out what went wrong
