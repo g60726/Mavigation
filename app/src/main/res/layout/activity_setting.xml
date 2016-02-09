@@ -9,6 +9,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.ninasmacpro.mavigation.SettingActivity">
 
+    <TextView
+        android:id="@+id/nickNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="nickName"/>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

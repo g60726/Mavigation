@@ -94,7 +94,9 @@
             android:parentActivityName=".MainActivity"></activity>
         <activity
             android:name=".SettingActivity"
-            android:label="@string/title_activity_setting"></activity>
+            android:label="@string/title_activity_setting"
+            android:parentActivityName=".TabActivity">
+        </activity>
         <activity
             android:name=".TabActivity"
             android:label="Mavigation"
