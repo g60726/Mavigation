@@ -1,6 +1,7 @@
 package com.example.ninasmacpro.mavigation;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,7 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -32,27 +38,27 @@ public class MapFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private ParseUser mParseUser = null;
+    private ParseObject mUserInfo = null; // user's associated UserInfo object
+
     private boolean hasGroup = false;
     private List<ParseUser> groupUser = null;
     private ParseObject groupOnParse = null;
 
+
     /** the "+" button on map fragment */
     // TODO: add this to ParseCurrentUser
     public void onButtonGroup() {
-        getFriends(); // get the newest sets of friends
-
-        // if the user has a group, pop up a menu to add more people (from friends) to the group
-        if (hasGroup) {
-
-        } else { // if user doesn't have a group yet, pop up a menu to create a group and add people
+        // if user doesn't have a group yet, jump to another activity to create a group and add people
+        if (!hasGroup) {
+            Intent intent = new Intent(getActivity(), GroupActivity.class);
+            startActivity(intent);
+        } else { // if the user has a group, jump to another activity to add more people (from friends) to the group
 
         }
     }
 
-    // get user's friends from Parse (or local data store?)
-    private void getFriends() {
 
-    }
 
     public MapFragment() {
         // Required empty public constructor
@@ -83,6 +89,10 @@ public class MapFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        // get current Parse user and its pointer to user info
+        mParseUser = ParseUser.getCurrentUser();
+        onButtonGroup();
     }
 
     @Override
