@@ -1,6 +1,7 @@
 package com.example.ninasmacpro.mavigation;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,16 +9,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.skobbler.ngx.map.SKAnnotation;
+import com.skobbler.ngx.map.SKCoordinateRegion;
+import com.skobbler.ngx.map.SKMapCustomPOI;
+import com.skobbler.ngx.map.SKMapPOI;
+import com.skobbler.ngx.map.SKMapSurfaceListener;
+import com.skobbler.ngx.map.SKMapSurfaceView;
+import com.skobbler.ngx.map.SKMapViewHolder;
+import com.skobbler.ngx.map.SKPOICluster;
+import com.skobbler.ngx.map.SKScreenPoint;
+import com.skobbler.ngx.util.SKLogging;
+
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MapFragment.OnFragmentInteractionListener} interface
+ * {MapFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements  SKMapSurfaceListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,7 +62,15 @@ public class MapFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    /**
+     * Surface view for displaying the map
+     */
+    private SKMapSurfaceView mapView;
 
+    /**
+     * the view that holds the map view
+     */
+    private SKMapViewHolder mapHolder;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,8 +84,143 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        View rootView =  inflater.inflate(R.layout.fragment_map, container, false);
+        mapHolder=(SKMapViewHolder) rootView.findViewById(R.id.map_surface_holder);
+        mapHolder.setMapSurfaceListener(this);
+        return rootView;
     }
 
 
+    @Override
+    public void onActionPan() {
+
+    }
+
+    @Override
+    public void onActionZoom() {
+
+    }
+
+    @Override
+    public void onSurfaceCreated(SKMapViewHolder skMapViewHolder) {
+        mapView = mapHolder.getMapSurfaceView();
+
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapHolder.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapHolder.onResume();
+    }
+    @Override
+    public void onMapRegionChanged(SKCoordinateRegion skCoordinateRegion) {
+
+    }
+
+    @Override
+    public void onMapRegionChangeStarted(SKCoordinateRegion skCoordinateRegion) {
+
+    }
+
+    @Override
+    public void onMapRegionChangeEnded(SKCoordinateRegion skCoordinateRegion) {
+
+    }
+
+    @Override
+    public void onDoubleTap(SKScreenPoint skScreenPoint) {
+
+    }
+
+    @Override
+    public void onSingleTap(SKScreenPoint skScreenPoint) {
+
+    }
+
+    @Override
+    public void onRotateMap() {
+
+    }
+
+    @Override
+    public void onLongPress(SKScreenPoint skScreenPoint) {
+
+    }
+
+    @Override
+    public void onInternetConnectionNeeded() {
+
+    }
+
+    @Override
+    public void onMapActionDown(SKScreenPoint skScreenPoint) {
+
+    }
+
+    @Override
+    public void onMapActionUp(SKScreenPoint skScreenPoint) {
+
+    }
+
+    @Override
+    public void onPOIClusterSelected(SKPOICluster skpoiCluster) {
+
+    }
+
+    @Override
+    public void onMapPOISelected(SKMapPOI skMapPOI) {
+
+    }
+
+    @Override
+    public void onAnnotationSelected(SKAnnotation skAnnotation) {
+
+    }
+
+    @Override
+    public void onCustomPOISelected(SKMapCustomPOI skMapCustomPOI) {
+
+    }
+
+    @Override
+    public void onCompassSelected() {
+
+    }
+
+    @Override
+    public void onCurrentPositionSelected() {
+
+    }
+
+    @Override
+    public void onObjectSelected(int i) {
+
+    }
+
+    @Override
+    public void onInternationalisationCalled(int i) {
+
+    }
+
+    @Override
+    public void onBoundingBoxImageRendered(int i) {
+
+    }
+
+    @Override
+    public void onGLInitializationError(String s) {
+
+    }
+
+    @Override
+    public void onScreenshotReady(Bitmap bitmap) {
+
+    }
 }
