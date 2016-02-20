@@ -8,6 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+
+import java.util.List;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,7 +32,27 @@ public class MapFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-//    private OnFragmentInteractionListener mListener;
+    private boolean hasGroup = false;
+    private List<ParseUser> groupUser = null;
+    private ParseObject groupOnParse = null;
+
+    /** the "+" button on map fragment */
+    // TODO: add this to ParseCurrentUser
+    public void onButtonGroup() {
+        getFriends(); // get the newest sets of friends
+
+        // if the user has a group, pop up a menu to add more people (from friends) to the group
+        if (hasGroup) {
+
+        } else { // if user doesn't have a group yet, pop up a menu to create a group and add people
+
+        }
+    }
+
+    // get user's friends from Parse (or local data store?)
+    private void getFriends() {
+
+    }
 
     public MapFragment() {
         // Required empty public constructor
