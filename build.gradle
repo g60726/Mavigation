@@ -3,10 +3,11 @@
 buildscript {
     repositories {
         jcenter()
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'com.google.gms:google-services:2.0.0-alpha3'
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -15,6 +16,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenCentral()
     }
 }
 
@@ -23,6 +25,7 @@ task clean(type: Delete) {
 }
 
 apply plugin: 'java'
+
 
 repositories {
     maven {
@@ -38,9 +41,9 @@ dependencies {
     compile files('libs/SKMaps.jar')
 }
 
-def assetsPath = "$projectDir/src/main/assets"
-def libsPath = "$projectDir/libs"
-def jniLibsPath = "$projectDir/src/main/jniLibs"
+def assetsPath = "$projectDir/app/src/main/assets"
+def libsPath = "$projectDir/app/libs"
+def jniLibsPath = "$projectDir/app/src/main/jniLibs"
 
 task installSKMaps << {
     copy {

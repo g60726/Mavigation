@@ -18,15 +18,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="com.example.googlemaps.permission.MAPS_RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <permission
-        android:name="com.example.googlemaps.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature" />
 
     <!-- EXTERNAL_STORAGE permissions are optional for Android 6.0 onwards. -->
     <uses-permission
@@ -44,10 +39,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- must put this within application -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+
+
 
         <!-- application id and client key for Parse -->
         <meta-data
@@ -56,20 +49,27 @@
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="zcFlMs6YsaLTLzcS0wLpRTMhDSH9p3xln0JgXJjn" />
+        <meta-data
+            android:name="com.skobbler.ngx.API_KEY"
+            android:value="2789ce3253f31d0fce53718d72969daba369e62a31691ec1047194ba8ac2887b"/>
 
         <activity
             android:name=".DispatchActivity"
             android:noHistory="true">
+
+        </activity>
+        <activity android:name=".SplashActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
@@ -83,9 +83,6 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBPrC3j1Ih8phSxW5v4jlx17d_fV2df4zw" />
 
         <activity
             android:name=".MapsActivity"

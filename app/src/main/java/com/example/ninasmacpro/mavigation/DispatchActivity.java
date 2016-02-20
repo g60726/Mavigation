@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.parse.ParseUser;
-
 /**
  * Here we go to different activity depends on whether or not the user has logged in already.
  */
