@@ -31,7 +31,7 @@ public class FriendFragment extends Fragment {
 
     private ListView mFriendListView;
     private ArrayAdapter<String> mFriendAdapter;
-//    private OnFragmentInteractionListener mListener;
+    // private OnFragmentInteractionListener mListener;
 
     public FriendFragment() {
         // Required empty public constructor

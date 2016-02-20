@@ -65,6 +65,9 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+
+
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
@@ -94,6 +97,17 @@
             android:name=".TabActivity"
             android:label="Mavigation"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".GroupActivity"
+            android:label="@string/title_activity_group"
+            android:parentActivityName=".TabActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.ninasmacpro.mavigation.TabActivity" />
+        </activity>
+
     </application>
 
 </manifest>
