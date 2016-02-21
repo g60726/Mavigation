@@ -1,6 +1,8 @@
 package com.example.ninasmacpro.mavigation;
 
+
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
@@ -15,8 +17,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class TabActivity extends AppCompatActivity {
@@ -56,6 +60,14 @@ public class TabActivity extends AppCompatActivity {
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                return true;
+            }
+        });
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -148,6 +160,39 @@ public class TabActivity extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
+    public class CustomViewPager extends ViewPager {
+
+        private boolean enabled;
+
+        public CustomViewPager(Context context, AttributeSet attrs) {
+            super(context, attrs);
+//            this.enabled = true;
+        }
+
+//        @Override
+//        public boolean onTouchEvent(MotionEvent event) {
+//            if (this.enabled) {
+//                return super.onTouchEvent(event);
+//            }
+//
+//            return false;
+//        }
+//
+//        @Override
+//        public boolean onInterceptTouchEvent(MotionEvent event) {
+//            if (this.enabled) {
+//                return super.onInterceptTouchEvent(event);
+//            }
+//
+//            return false;
+//        }
+//
+//        public void setPagingEnabled(boolean enabled) {
+//            this.enabled = enabled;
+//        }
+    }
+
+
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {

@@ -1,14 +1,21 @@
 package com.example.ninasmacpro.mavigation;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +44,7 @@ public class FriendFragment extends Fragment {
         // Required empty public constructor
     }
 
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -63,8 +71,9 @@ public class FriendFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-
+//        ParseQuery<ParseObject> query = ParseQuery.getQuery("");
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,11 +85,22 @@ public class FriendFragment extends Fragment {
                 android.R.layout.simple_list_item_1, new String[] { "Item 1",
                 "Item 2", "Item 2", "Item 3", "Item 4", "Item 5" });
         mFriendListView.setAdapter(mFriendAdapter);
+
+
+
+//        add friend button
+        Button newPage = (Button)rootView.findViewById(R.id.searchFriendButton);
+        newPage.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SearchFriendActivity.class);
+                startActivity(intent);
+            }
+        });
         return rootView;
     }
 
-//    private String getFriendList(){
-//
-//    }
+
 
 }

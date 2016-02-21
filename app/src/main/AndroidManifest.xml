@@ -64,9 +64,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-
-
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
         <activity
             android:name=".LoginActivity"
@@ -96,8 +95,7 @@
         <activity
             android:name=".TabActivity"
             android:label="Mavigation"
-            android:theme="@style/AppTheme.NoActionBar" />
-
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".GroupActivity"
             android:label="@string/title_activity_group"
@@ -106,6 +104,11 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.ninasmacpro.mavigation.TabActivity" />
+        </activity>
+        <activity
+            android:name=".SearchFriendActivity"
+            android:label="Add Contacts"
+            android:parentActivityName=".TabActivity">
         </activity>
 
     </application>
