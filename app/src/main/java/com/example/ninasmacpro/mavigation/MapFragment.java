@@ -1,14 +1,19 @@
 package com.example.ninasmacpro.mavigation;
 
+import android.Manifest;
 import android.content.Context;
 import android.graphics.Bitmap;
+
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.parse.ParseUser;
 import com.skobbler.ngx.map.SKAnnotation;
 import com.skobbler.ngx.map.SKCoordinateRegion;
 import com.skobbler.ngx.map.SKMapCustomPOI;
@@ -39,7 +44,7 @@ public class MapFragment extends Fragment implements  SKMapSurfaceListener{
     private String mParam1;
     private String mParam2;
 
-//    private OnFragmentInteractionListener mListener;
+    private ParseUser mParseUser = null;
 
     public MapFragment() {
         // Required empty public constructor
@@ -74,10 +79,16 @@ public class MapFragment extends Fragment implements  SKMapSurfaceListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        // get current Parse user and its pointer to user info
+        mParseUser = ParseUser.getCurrentUser();
+        //onButtonGroup();
     }
 
     @Override

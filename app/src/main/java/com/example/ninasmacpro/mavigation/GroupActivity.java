@@ -178,9 +178,10 @@ public class GroupActivity extends Activity {
         Button myButton = (Button) findViewById(R.id.findSelected);
         myButton.setOnClickListener(new View.OnClickListener() {
 
+            // once clicked, add all selected friends into group
             @Override
             public void onClick(View v) {
-
+                /*
                 StringBuffer responseText = new StringBuffer();
                 responseText.append("The following were selected...\n");
 
@@ -191,7 +192,7 @@ public class GroupActivity extends Activity {
                         responseText.append("\n" + friend.getName());
                     }
                 }
-
+                */
             }
         });
 
