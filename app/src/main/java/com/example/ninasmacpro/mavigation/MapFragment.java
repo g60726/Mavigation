@@ -1,6 +1,7 @@
 package com.example.ninasmacpro.mavigation;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 
@@ -12,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.parse.ParseUser;
 import com.skobbler.ngx.map.SKAnnotation;
@@ -23,6 +25,10 @@ import com.skobbler.ngx.map.SKMapSurfaceView;
 import com.skobbler.ngx.map.SKMapViewHolder;
 import com.skobbler.ngx.map.SKPOICluster;
 import com.skobbler.ngx.map.SKScreenPoint;
+import com.skobbler.ngx.positioner.SKCurrentPositionListener;
+import com.skobbler.ngx.positioner.SKCurrentPositionProvider;
+import com.skobbler.ngx.positioner.SKPosition;
+import com.skobbler.ngx.positioner.SKPositionerManager;
 import com.skobbler.ngx.util.SKLogging;
 
 
@@ -34,7 +40,7 @@ import com.skobbler.ngx.util.SKLogging;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment implements SKMapSurfaceListener {
+public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCurrentPositionListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -76,6 +82,17 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener {
      * the view that holds the map view
      */
     private SKMapViewHolder mapHolder;
+
+    private SKCurrentPositionProvider currentPositionProvider;
+    /**
+     * Current position
+     */
+    private SKPosition currentPosition;
+
+    /**
+     * timestamp for the last currentPosition
+     */
+    private long currentPositionTime;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,8 +113,15 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView =  inflater.inflate(R.layout.fragment_map, container, false);
+        //start map holder map view and start map view listener
         mapHolder=(SKMapViewHolder) rootView.findViewById(R.id.map_surface_holder);
         mapHolder.setMapSurfaceListener(this);
+
+        //set current position
+        currentPositionProvider = new SKCurrentPositionProvider(getActivity());
+        currentPositionProvider.setCurrentPositionListener(this);
+        currentPositionProvider.requestLocationUpdates(Utils.hasGpsModule(getActivity()), Utils.hasNetworkModule(getActivity()), false);
+
         return rootView;
     }
 
@@ -114,9 +138,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener {
 
     @Override
     public void onSurfaceCreated(SKMapViewHolder skMapViewHolder) {
+
+
         mapView = mapHolder.getMapSurfaceView();
-
-
+        mapView.centerMapOnCurrentPosition();
     }
 
     @Override
@@ -233,5 +258,12 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener {
     @Override
     public void onScreenshotReady(Bitmap bitmap) {
 
+    }
+
+    @Override
+    public void onCurrentPositionUpdate(SKPosition skPosition) {
+        this.currentPositionTime = System.currentTimeMillis();
+        this.currentPosition = skPosition;
+        SKPositionerManager.getInstance().reportNewGPSPosition(this.currentPosition);
     }
 }
