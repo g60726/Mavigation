@@ -12,9 +12,11 @@ import android.widget.ListView;
 import android.widget.SearchView;
 
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +45,7 @@ public class SearchFriendActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 Log.i(TAG, "onQueryTextSubmit: success " + " query: " + query);
 
-                ParseQuery<ParseObject> queryFriend = new ParseQuery<ParseObject>(
-                        "User");
+                ParseQuery queryFriend = ParseUser.getQuery();
 //                queryFriend.orderByAscending("username");
                 queryFriend.whereStartsWith("username", query);
                 queryFriend.findInBackground(new FindCallback<ParseObject>() {
