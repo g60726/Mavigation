@@ -40,7 +40,12 @@ public class TabActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
-    private static final int REQUEST_READ_PHONE_STATE = 0;
+    private static final int REQUEST_READ_PHONE_STATE = 1;
+    private static final int REQUEST_INTERNET = 2;
+    private static final int REQUEST_ACCESS_FINE_LOCATION = 3;
+    private static final int REQUEST_ACCESS_COARSE_LOCATION = 4;
+    private static final int REQUEST_ACCESS_NETWORK_STATE = 5;
+    private static final int REQUEST_ACCESS_WIFI_STATE = 6;
 
     private View mLayout;
 
@@ -60,20 +65,14 @@ public class TabActivity extends AppCompatActivity {
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                return true;
-            }
-        });
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
     }
+
+
 
     // stupid android 6.0!!!!!!
     private void requestPermissions() {
@@ -82,28 +81,22 @@ public class TabActivity extends AppCompatActivity {
                 Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(TabActivity.this,
                     Manifest.permission.READ_PHONE_STATE)) {
 
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
                 Snackbar.make(mLayout,"Read Phone State permission is needed for the map to work",
                         Snackbar.LENGTH_INDEFINITE)
                         .setAction("ok", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 ActivityCompat.requestPermissions(TabActivity.this,
-                                        new String[]{Manifest.permission.CAMERA},
+                                        new String[]{Manifest.permission.READ_PHONE_STATE},
                                         REQUEST_READ_PHONE_STATE);
                             }
                         })
                         .show();
 
             } else {
-
-                // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(TabActivity.this,
                         new String[]{Manifest.permission.READ_PHONE_STATE},
                         REQUEST_READ_PHONE_STATE);
@@ -111,21 +104,69 @@ public class TabActivity extends AppCompatActivity {
             }
         }
 
-        ActivityCompat.requestPermissions(TabActivity.this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                REQUEST_READ_PHONE_STATE);
+        if (ContextCompat.checkSelfPermission(TabActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(TabActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                Snackbar.make(mLayout,"Read Phone State permission is needed for the map to work",
+                        Snackbar.LENGTH_INDEFINITE)
+                        .setAction("ok", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                ActivityCompat.requestPermissions(TabActivity.this,
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        REQUEST_ACCESS_FINE_LOCATION);
+                            }
+                        })
+                        .show();
+
+            } else {
+                ActivityCompat.requestPermissions(TabActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_ACCESS_FINE_LOCATION);
+
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(TabActivity.this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(TabActivity.this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
+
+                Snackbar.make(mLayout,"Read Phone State permission is needed for the map to work",
+                        Snackbar.LENGTH_INDEFINITE)
+                        .setAction("ok", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                ActivityCompat.requestPermissions(TabActivity.this,
+                                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                        REQUEST_ACCESS_COARSE_LOCATION);
+                            }
+                        })
+                        .show();
+
+            } else {
+                ActivityCompat.requestPermissions(TabActivity.this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        REQUEST_ACCESS_COARSE_LOCATION);
+
+            }
+        }
+
         ActivityCompat.requestPermissions(TabActivity.this,
                 new String[]{Manifest.permission.INTERNET},
-                REQUEST_READ_PHONE_STATE);
+                REQUEST_INTERNET);
         ActivityCompat.requestPermissions(TabActivity.this,
                 new String[]{Manifest.permission.ACCESS_NETWORK_STATE},
-                REQUEST_READ_PHONE_STATE);
-        ActivityCompat.requestPermissions(TabActivity.this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                REQUEST_READ_PHONE_STATE);
+                REQUEST_ACCESS_NETWORK_STATE);
         ActivityCompat.requestPermissions(TabActivity.this,
                 new String[]{Manifest.permission.ACCESS_WIFI_STATE},
-                REQUEST_READ_PHONE_STATE);
+                REQUEST_ACCESS_WIFI_STATE);
     }
 
     @Override
