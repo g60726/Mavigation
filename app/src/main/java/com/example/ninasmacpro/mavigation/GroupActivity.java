@@ -68,6 +68,7 @@ public class GroupActivity extends Activity {
             friends.add(friend);
         }
 
+        // TODO: faked friend, delete it afterwards
         Friend friend = new Friend("Johny", "he@sp.xom",false);
         friends.add(friend);
 
