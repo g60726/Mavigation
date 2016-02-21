@@ -11,9 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchFriendActivity extends AppCompatActivity {
@@ -22,7 +25,9 @@ public class SearchFriendActivity extends AppCompatActivity {
 
     ListView lv;
     SearchView sv;
-    List<ParseObject> ob;
+    private List<Population> friendpoopulationlist = null;
+    FriendListViewAdapter adapter;
+//    List<ParseObject> ob;
 
 //    ArrayAdapter<>
     @Override
@@ -36,12 +41,37 @@ public class SearchFriendActivity extends AppCompatActivity {
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.i(TAG, "onQueryTextSubmit: success");
+                Log.i(TAG, "onQueryTextSubmit: success " + " query: " + query);
+
                 ParseQuery<ParseObject> queryFriend = new ParseQuery<ParseObject>(
                         "User");
-                queryFriend.orderByAscending("username");
-//                queryFriend.whereEqualTo()
-//                queryFriend.getInBackground()
+//                queryFriend.orderByAscending("username");
+                queryFriend.whereStartsWith("username", query);
+                queryFriend.findInBackground(new FindCallback<ParseObject>() {
+                    public void done(List<ParseObject> friendsList, ParseException e) {
+                        if (e == null) {
+                            friendpoopulationlist = new ArrayList<Population>();
+                            Log.d("score", "Retrieved " + friendsList.size() + " scores");
+                            for (ParseObject friend : friendsList) {
+                                // Locate images in flag column
+//                                ParseFile image = (ParseFile) country.get("flag");
+
+                                Population people = new Population();
+                                people.setNickname((String) friend.get("nickName"));
+                                people.setUsername((String) friend.get("username"));
+                                people.setObjectId((String) friend.get("objectId"));
+
+                                friendpoopulationlist.add(people);
+                                lv = (ListView) findViewById(R.id.findFriendListView);
+                                adapter = new FriendListViewAdapter(SearchFriendActivity.this, friendpoopulationlist);
+                                lv.setAdapter(adapter);
+
+                            }
+                        } else {
+                            Log.d("score", "Error: " + e.getMessage());
+                        }
+                    }
+                });
                 return false;
             }
 
