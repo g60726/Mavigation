@@ -49,7 +49,6 @@ public class GroupActivity extends AppCompatActivity {
         mGroupNameEditText = (EditText) findViewById(R.id.groupNameEditText);
         mLeaveGroupButton = (Button) findViewById(R.id.LeaveGroupButton);
 
-
         Bundle bundle = getIntent().getExtras();
         hasGroup = bundle.getBoolean("hasGroup");
 
@@ -111,7 +110,6 @@ public class GroupActivity extends AppCompatActivity {
         mAdapter = new MyCustomAdapter(this, R.layout.group_friend_list_layout, mFriends);
         mFriendsList = (ListView) findViewById(R.id.friendList);
         mFriendsList.setAdapter(mAdapter);
-
     }
 
     public class Friend {
