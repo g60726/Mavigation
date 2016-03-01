@@ -45,20 +45,23 @@ public class SearchFriendActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 Log.i(TAG, "onQueryTextSubmit: success " + " query: " + query);
 
-                ParseQuery queryFriend = ParseUser.getQuery();
+//                ParseQuery queryFriend = ParseUser.getQuery();
+                ParseQuery<ParseUser> queryFriend = ParseUser.getQuery();
+//                Log.d("check1", "working");
 //                queryFriend.orderByAscending("username");
-                queryFriend.whereStartsWith("username", query);
-                queryFriend.findInBackground(new FindCallback<ParseObject>() {
-                    public void done(List<ParseObject> friendsList, ParseException e) {
+//                queryFriend.whereStartsWith("username", query);
+                queryFriend.findInBackground(new FindCallback<ParseUser>() {
+                    public void done(List<ParseUser> friendsList, ParseException e) {
                         if (e == null) {
+                            Log.w("check", "this query was successful");
                             friendpoopulationlist = new ArrayList<Population>();
-                            Log.d("score", "Retrieved " + friendsList.size() + " scores");
+//                            Log.d("score", "Retrieved " + friendsList.size() + " scores");
                             for (ParseObject friend : friendsList) {
                                 // Locate images in flag column
 //                                ParseFile image = (ParseFile) country.get("flag");
 
                                 Population people = new Population();
-                                people.setNickname((String) friend.get("nickName"));
+                                people.setNickname((String)  friend.get("nickName"));
                                 people.setUsername((String) friend.get("username"));
                                 people.setObjectId((String) friend.get("objectId"));
 
@@ -69,7 +72,9 @@ public class SearchFriendActivity extends AppCompatActivity {
 
                             }
                         } else {
-                            Log.d("score", "Error: " + e.getMessage());
+                            Log.w("score", "Error: " + e.getMessage());
+                            Log.w("check", "Something went wrong.");
+
                         }
                     }
                 });
