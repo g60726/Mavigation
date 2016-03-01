@@ -32,12 +32,4 @@ public class Population {
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
-
-//    public String getFlag() {
-//        return flag;
-//    }
-//
-//    public void setFlag(String flag) {
-//        this.flag = flag;
-//    }
 }

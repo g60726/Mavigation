@@ -61,16 +61,31 @@ public class SearchFriendActivity extends AppCompatActivity {
 //                                ParseFile image = (ParseFile) country.get("flag");
 
                                 Population people = new Population();
-                                people.setNickname((String)  friend.get("nickName"));
+                                people.setNickname((String) friend.get("nickName"));
                                 people.setUsername((String) friend.get("username"));
-                                people.setObjectId((String) friend.get("objectId"));
+                                people.setObjectId((String) friend.getObjectId());
 
+//                                String nickname = (String )friend.get("nickName");
+//                                Log.e("nick name is ", nickname);
+//                                String username = (String )friend.get("username");
+//                                Log.e("username is ", username);
+//                                String objectId = (String )friend.getObjectId();
+//                                Log.e("objectId is ", objectId);
+                                String nickname = people.getNickname();
+                                Log.e("nick name is ", nickname);
+                                String username = people.getUsername();
+                                Log.e("username is ", username);
+                                String objectId = people.getObjectId();
+                                Log.e("objectId is ", objectId);
                                 friendpoopulationlist.add(people);
-                                lv = (ListView) findViewById(R.id.findFriendListView);
-                                adapter = new FriendListViewAdapter(SearchFriendActivity.this, friendpoopulationlist);
-                                lv.setAdapter(adapter);
+//                                lv = (ListView) findViewById(R.id.findFriendListView);
+//                                adapter = new FriendListViewAdapter(SearchFriendActivity.this, friendpoopulationlist);
+//                                lv.setAdapter(adapter);
 
                             }
+                            lv = (ListView) findViewById(R.id.findFriendListView);
+                            adapter = new FriendListViewAdapter(SearchFriendActivity.this, friendpoopulationlist);
+//                            lv.setAdapter(adapter);
                         } else {
                             Log.w("score", "Error: " + e.getMessage());
                             Log.w("check", "Something went wrong.");
