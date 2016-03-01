@@ -93,6 +93,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
      * timestamp for the last currentPosition
      */
     private long currentPositionTime;
+    /*
+    check if start already by centering
+     */
+    private boolean start=true;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,7 +125,6 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         currentPositionProvider = new SKCurrentPositionProvider(getActivity());
         currentPositionProvider.setCurrentPositionListener(this);
         currentPositionProvider.requestLocationUpdates(Utils.hasGpsModule(getActivity()), Utils.hasNetworkModule(getActivity()), false);
-
         return rootView;
     }
 
@@ -139,9 +142,11 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     @Override
     public void onSurfaceCreated(SKMapViewHolder skMapViewHolder) {
 
-
         mapView = mapHolder.getMapSurfaceView();
-        mapView.centerMapOnCurrentPosition();
+        if(currentPosition != null){
+            mapView.centerMapOnPosition(currentPosition.getCoordinate());
+            start=false;
+        }
     }
 
     @Override
@@ -262,8 +267,15 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     @Override
     public void onCurrentPositionUpdate(SKPosition skPosition) {
+
         this.currentPositionTime = System.currentTimeMillis();
         this.currentPosition = skPosition;
+        if(this.start){
+            if (mapView != null){
+                mapView.centerMapOnPosition(this.currentPosition.getCoordinate());
+                this.start=false;
+            }
+        }
         SKPositionerManager.getInstance().reportNewGPSPosition(this.currentPosition);
     }
 }
