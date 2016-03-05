@@ -5,6 +5,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -47,7 +48,16 @@ public class TabActivity extends AppCompatActivity {
     private static final int REQUEST_ACCESS_NETWORK_STATE = 5;
     private static final int REQUEST_ACCESS_WIFI_STATE = 6;
 
+    private MapFragment mMapFragment = null;
+    private MessageFragment mMessageFragment = null;
+    private FriendFragment mFriendFragment = null;
+
     private View mLayout;
+
+
+    public void onButtonGroup(View view) {
+        mMapFragment.onButtonGroup();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +76,33 @@ public class TabActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+
+        // hide fab in tabs other than map fragment
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+                switch (position) {
+                    case 0: // map fragment
+                        fab.show();
+                        break;
+
+                    default:
+                        fab.hide();
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -247,13 +284,16 @@ public class TabActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     // Top Rated fragment activity
-                    return MapFragment.newInstance("p1", "p2");
+                    mMapFragment = MapFragment.newInstance("p1", "p2");
+                    return mMapFragment;
                 case 1:
                     // Games fragment activity
-                    return FriendFragment.newInstance("p1", "p2");
+                    mFriendFragment = FriendFragment.newInstance("p1", "p2");
+                    return mFriendFragment;
                 case 2:
                     // Movies fragment activity
-                    return MessageFragment.newInstance("p1", "p2");
+                    mMessageFragment = MessageFragment.newInstance("p1", "p2");
+                    return mMessageFragment;
             }
 
             return null;

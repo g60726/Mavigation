@@ -51,7 +51,8 @@
 
         <activity
             android:name=".DispatchActivity"
-            android:noHistory="true"></activity>
+            android:noHistory="true">
+        </activity>
         <activity
             android:name=".SplashActivity"
             android:noHistory="true">
@@ -72,15 +73,6 @@
             android:label="@string/title_activity_login"
             android:parentActivityName=".MainActivity" />
 
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/.
-        -->
-
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
@@ -91,20 +83,20 @@
         <activity
             android:name=".SettingActivity"
             android:label="@string/title_activity_setting"
-            android:parentActivityName=".TabActivity"></activity>
+            android:parentActivityName=".TabActivity">
+
+        </activity>
         <activity
             android:name=".TabActivity"
             android:label="Mavigation"
             android:theme="@style/AppTheme.NoActionBar"/>
+
         <activity
             android:name=".GroupActivity"
             android:label="@string/title_activity_group"
-            android:parentActivityName=".TabActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.ninasmacpro.mavigation.TabActivity" />
+            android:parentActivityName=".TabActivity">
         </activity>
+
         <activity
             android:name=".SearchFriendActivity"
             android:label="Add Contacts"

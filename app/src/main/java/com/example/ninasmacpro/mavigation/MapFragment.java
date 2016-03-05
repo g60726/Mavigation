@@ -3,6 +3,7 @@ package com.example.ninasmacpro.mavigation;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 
 import android.net.Uri;
@@ -10,12 +11,20 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.skobbler.ngx.map.SKAnnotation;
 import com.skobbler.ngx.map.SKCoordinateRegion;
 import com.skobbler.ngx.map.SKMapCustomPOI;
@@ -31,6 +40,13 @@ import com.skobbler.ngx.positioner.SKPosition;
 import com.skobbler.ngx.positioner.SKPositionerManager;
 import com.skobbler.ngx.util.SKLogging;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,17 +56,26 @@ import com.skobbler.ngx.util.SKLogging;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCurrentPositionListener{
-    // TODO: Rename parameter arguments, choose names that match
+public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCurrentPositionListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final int REQUEST_CODE_CREATE_GROUP = 1;
+    private static final int REQUEST_CODE_ADD_PEOPLE_TO_GROUP = 2;
+
+    private SKMapSurfaceView mapView; // Surface view for displaying the map
+
 
     private ParseUser mParseUser = null;
+    private ParseObject mUserInfo = null; // user's associated UserInfo object
+
+    private boolean hasGroup = false;
+    //private List<ParseUser> groupUser = null;
+    private ParseObject mGroupOnParse = null;
+    private String mGroupName = null;
+    private String mGroupObjectId = null;
+    private ArrayList<String> mGroupMemberObjectId = null;
 
     public MapFragment() {
         // Required empty public constructor
@@ -73,10 +98,6 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         fragment.setArguments(args);
         return fragment;
     }
-    /**
-     * Surface view for displaying the map
-     */
-    private SKMapSurfaceView mapView;
 
     /**
      * the view that holds the map view
@@ -96,29 +117,124 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     /*
     check if start already by centering
      */
-    private boolean start=true;
+    private boolean start = true;
+
+    /** the "+" button on map fragment */
+    // TODO: add this to ParseCurrentUser
+    public void onButtonGroup() {
+        // if user doesn't have a group yet, jump to another activity to create a group and add people
+        if (!hasGroup) {
+            Intent intent = new Intent(getActivity(), GroupActivity.class);
+            intent.putExtra("hasGroup", hasGroup);
+            startActivityForResult(intent, REQUEST_CODE_CREATE_GROUP);
+        } else { // if the user has a group, jump to another activity to add more people (from friends) to the group
+            Intent intent = new Intent(getActivity(), GroupActivity.class); //TODO: change this to a diff class?
+            intent.putExtra("hasGroup", hasGroup);
+            intent.putExtra("groupName", mGroupName);
+            intent.putStringArrayListExtra("currentGroupMember", mGroupMemberObjectId);
+            startActivityForResult(intent, REQUEST_CODE_ADD_PEOPLE_TO_GROUP);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_CREATE_GROUP) {
+            if (Activity.RESULT_OK == resultCode) {
+                // Grab whatever data identifies that car that was sent in
+                // setResult(int, Intent)
+                hasGroup = true;
+                Bundle bundle = data.getExtras();
+                mGroupName = bundle.getString("groupName");
+                ArrayList<String> groupMemberObjectId = bundle.getStringArrayList("groupMemberObjectId");
+
+                groupMemberObjectId.add(mParseUser.getObjectId()); // add currentUser to group
+                Log.w("groupmemberobjectid", groupMemberObjectId.toString());
+                mGroupMemberObjectId = new ArrayList<String>(groupMemberObjectId);
+                Log.w("groupmember_hashset", mGroupMemberObjectId.toString());
+                mGroupOnParse = new ParseObject("Group");
+                updateGroup(groupMemberObjectId); // to ensure uniqueness of each member
+            } else {
+                // not used now
+            }
+        } else if (requestCode == REQUEST_CODE_ADD_PEOPLE_TO_GROUP) {
+            if (Activity.RESULT_OK == resultCode) {
+                Bundle bundle = data.getExtras();
+                mGroupName = bundle.getString("groupName"); // user may have changed group name
+                ArrayList<String> newGroupMemberObjectId = bundle.getStringArrayList("groupMemberObjectId");
+                addToCurrentGroup(newGroupMemberObjectId);
+            } else {
+                // now used now
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void addToCurrentGroup(final ArrayList<String> newGroupMemberObjectId) {
+        mGroupMemberObjectId.addAll(newGroupMemberObjectId);
+        /*
+        for (String temp: newGroupMemberObjectId) {
+            mGroupMemberObjectId.add(temp);
+        }*/
+
+        // get Group object
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
+        query.getInBackground(mGroupObjectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    mGroupOnParse = object;
+                    // update Group object
+                    updateGroup(newGroupMemberObjectId);
+                } else {
+                    // something went wrong
+                }
+            }
+        });
+
+    }
+
+    private void updateGroup(ArrayList<String> newGroupMember) {
+        mGroupOnParse.put("groupName", mGroupName);
+        final ParseRelation<ParseUser> relation = mGroupOnParse.getRelation("members");
+        String [] temp = newGroupMember.toArray(new String[newGroupMember.size()]);
+        // query all group members (a list of ParseUsers) from Parse
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereContainedIn("objectId", Arrays.asList(temp));
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> users, ParseException e) {
+                if (e == null) {
+                    Log.w("add user to relation", "success");
+                    // The query was successful.
+                    for (ParseUser user: users) {
+                        Log.w("add user to relation", "there is some user!");
+                        relation.add(user);
+                    }
+                    mGroupOnParse.saveInBackground(new SaveCallback() {
+                        public void done(ParseException e) {
+                            mGroupObjectId = mGroupOnParse.getObjectId();
+                        }
+                    });
+                } else {
+                    // Something went wrong.
+                }
+            }
+        });
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
         // get current Parse user and its pointer to user info
         mParseUser = ParseUser.getCurrentUser();
-        //onButtonGroup();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView =  inflater.inflate(R.layout.fragment_map, container, false);
         //start map holder map view and start map view listener
-        mapHolder=(SKMapViewHolder) rootView.findViewById(R.id.map_surface_holder);
+        mapHolder = (SKMapViewHolder) rootView.findViewById(R.id.map_surface_holder);
         mapHolder.setMapSurfaceListener(this);
 
         //set current position
@@ -128,6 +244,13 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         return rootView;
     }
 
+    public void leaveCurrentGroup() {
+        hasGroup = false;
+        mGroupOnParse = null;
+        mGroupName = null;
+        mGroupObjectId = null;
+        mGroupMemberObjectId = null;
+    }
 
     @Override
     public void onActionPan() {

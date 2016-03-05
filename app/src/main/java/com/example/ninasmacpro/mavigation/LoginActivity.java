@@ -25,7 +25,7 @@ import com.parse.ParseUser;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity { //implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
 
     // UI references.
