@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -16,9 +16,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.parse.GetCallback;
+import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
@@ -29,7 +29,6 @@ public class GroupActivity extends AppCompatActivity {
     private ListView mFriendsList = null;
 
     private ParseUser mParseUser = null;
-    private ParseObject mUserInfo = null; // user's associated UserInfo object
     private List<ParseUser> mParseObjectFriends = null; // user's list of friends
     private MyCustomAdapter mAdapter = null;
     private EditText mGroupNameEditText = null;
@@ -61,19 +60,18 @@ public class GroupActivity extends AppCompatActivity {
 
     }
 
-    // get user's friends from Parse
+    // get user's friends from Parse FIXME: is this working?
     private void getFriends() {
-        mParseUser.getParseObject("userInfo").fetchIfNeededInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                try {
-                    mUserInfo = object; //TODO: will this work?
-                    ParseRelation friendsRelation = mUserInfo.getRelation("friends");
-                    mParseObjectFriends = friendsRelation.getQuery().find(); // blocking
+        ParseRelation friendsRelation = mParseUser.getRelation("friends");
+        ParseQuery<ParseUser> query = friendsRelation.getQuery();
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> users, ParseException e) {
+                if (e == null) {
+                    mParseObjectFriends = users;
                     displayListView(); // once we get a list of friends, display them
                     checkButtonClick();
-                } catch (com.parse.ParseException e1) {
-                    e1.printStackTrace();
+                } else {
+                    // Something went wrong.
                 }
             }
         });
@@ -91,12 +89,6 @@ public class GroupActivity extends AppCompatActivity {
                 mFriends.add(friend);
             }
 
-        }
-
-        if (!currentGroupMember.contains("OUQFaKiwCY")) {
-            // TODO: faked friend, delete it afterwards
-            Friend friend = new Friend("OUQFaKiwCY", "h@sq.com", "Nina", false);
-            mFriends.add(friend);
         }
         mAdapter = new MyCustomAdapter(this, R.layout.group_list_layout, mFriends);
         mFriendsList = (ListView) findViewById(R.id.friendList);

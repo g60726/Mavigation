@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
@@ -55,13 +54,10 @@ import com.skobbler.ngx.routing.SKRouteManager;
 import com.skobbler.ngx.routing.SKRouteSettings;
 import com.skobbler.ngx.util.SKLogging;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 
 /**
@@ -88,7 +84,6 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     private ParseObject mUserInfo = null; // user's associated UserInfo object
 
     private boolean hasGroup = false;
-    //private List<ParseUser> groupUser = null;
     private ParseObject mGroupOnParse = null;
     private String mGroupName = null;
     private String mGroupObjectId = null;
@@ -206,10 +201,6 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     private void addToCurrentGroup(final ArrayList<String> newGroupMemberObjectId) {
         mGroupMemberObjectId.addAll(newGroupMemberObjectId);
-        /*
-        for (String temp: newGroupMemberObjectId) {
-            mGroupMemberObjectId.add(temp);
-        }*/
 
         // get Group object
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
@@ -237,15 +228,15 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> users, ParseException e) {
                 if (e == null) {
-                    Log.w("add user to relation", "success");
                     // The query was successful.
-                    for (ParseUser user : users) {
-                        Log.w("add user to relation", "there is some user!");
+                    for (ParseUser user: users) {
                         relation.add(user);
                     }
                     mGroupOnParse.saveInBackground(new SaveCallback() {
                         public void done(ParseException e) {
                             mGroupObjectId = mGroupOnParse.getObjectId();
+                            mParseUser.put("groupObjectId", mGroupObjectId);
+                            mParseUser.saveInBackground();
                         }
                     });
                 } else {
@@ -261,6 +252,37 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
         // get current Parse user and its pointer to user info
         mParseUser = ParseUser.getCurrentUser();
+
+        // check if user is in a group
+        mGroupObjectId = (String) mParseUser.get("groupObjectId");
+        if (mGroupObjectId != null) {
+            // get Group object
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
+            query.getInBackground(mGroupObjectId, new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        if (object != null) {
+                            mGroupOnParse = object;
+                            hasGroup = true;
+                            mGroupName = mGroupOnParse.getString("groupName");
+                            mGroupMemberObjectId = new ArrayList<String>();
+                            ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
+                            try {
+                                List<ParseUser> groupMember = temp.getQuery().find();
+                                for (ParseUser temp2: groupMember) {
+                                    Log.w("getGroupObject", temp2.getObjectId());
+                                    mGroupMemberObjectId.add(temp2.getObjectId());
+                                }
+                            } catch (ParseException e2) {
+
+                            }
+                        }
+                    } else {
+                        // something went wrong
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -328,10 +350,20 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     public void leaveCurrentGroup() {
         hasGroup = false;
-        mGroupOnParse = null;
         mGroupName = null;
-        mGroupObjectId = null;
         mGroupMemberObjectId = null;
+
+        // update ParseUser on Parse
+        mGroupObjectId = null;
+        mParseUser.put("groupObjectId", null);
+        mParseUser.saveInBackground();
+
+        // update Group on Parse
+        mGroupOnParse = null;
+        ParseRelation<ParseUser> updateGroup = mGroupOnParse.getRelation("members");
+        updateGroup.remove(mParseUser); // FIXME: will this work?
+        mGroupOnParse.saveInBackground();
+
     }
 
     @Override
