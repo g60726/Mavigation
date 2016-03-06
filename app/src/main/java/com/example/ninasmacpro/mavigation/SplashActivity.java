@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.skobbler.ngx.SKPrepareMapTextureListener;
 import com.skobbler.ngx.SKPrepareMapTextureThread;
 import com.skobbler.ngx.map.SKMapSurfaceView;
+import com.skobbler.ngx.navigation.SKAdvisorSettings;
+import com.skobbler.ngx.routing.SKRouteManager;
 import com.skobbler.ngx.util.SKLogging;
 import com.skobbler.ngx.versioning.SKMapUpdateListener;
 import com.skobbler.ngx.versioning.SKVersioningManager;
@@ -72,7 +74,7 @@ public class SplashActivity extends Activity implements SKPrepareMapTextureListe
         } else {
             // show a dialog and then finish
         }
-        ((MavigationApplication)getApplicationContext()).getAppPrefs().saveStringPreference("mapResourcesPath", mapResourcesDirPath);
+        ((MavigationApplication) getApplicationContext()).getAppPrefs().saveStringPreference("mapResourcesPath", mapResourcesDirPath);
         ((MavigationApplication) getApplication()).setMapResourcesDirPath(mapResourcesDirPath);
         checkForUpdate();
         if (!new File(mapResourcesDirPath).exists()) {

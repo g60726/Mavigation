@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -36,10 +39,20 @@ import com.skobbler.ngx.map.SKMapSurfaceView;
 import com.skobbler.ngx.map.SKMapViewHolder;
 import com.skobbler.ngx.map.SKPOICluster;
 import com.skobbler.ngx.map.SKScreenPoint;
+import com.skobbler.ngx.navigation.SKAdvisorSettings;
+import com.skobbler.ngx.navigation.SKNavigationListener;
+import com.skobbler.ngx.navigation.SKNavigationManager;
+import com.skobbler.ngx.navigation.SKNavigationSettings;
+import com.skobbler.ngx.navigation.SKNavigationState;
 import com.skobbler.ngx.positioner.SKCurrentPositionListener;
 import com.skobbler.ngx.positioner.SKCurrentPositionProvider;
 import com.skobbler.ngx.positioner.SKPosition;
 import com.skobbler.ngx.positioner.SKPositionerManager;
+import com.skobbler.ngx.routing.SKRouteInfo;
+import com.skobbler.ngx.routing.SKRouteJsonAnswer;
+import com.skobbler.ngx.routing.SKRouteListener;
+import com.skobbler.ngx.routing.SKRouteManager;
+import com.skobbler.ngx.routing.SKRouteSettings;
 import com.skobbler.ngx.util.SKLogging;
 
 import java.lang.reflect.Array;
@@ -47,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 
@@ -58,7 +72,8 @@ import java.util.Set;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCurrentPositionListener {
+public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCurrentPositionListener,SKRouteListener,SKNavigationListener
+{
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -120,7 +135,24 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     check if start already by centering
      */
     private boolean start = true;
-
+    /*
+    destination cordinate creating by single tap
+     */
+    private SKCoordinate desCordinate = null;
+    /*
+    navigation button
+     */
+    private ImageButton navigateButton;
+    /*
+    text to speech engine
+     */
+    private TextToSpeech textToSpeechEngine;
+    /*
+    text to speech map config
+     */
+    private enum MapAdvices {
+        TEXT_TO_SPEECH, AUDIO_FILES
+    }
     /** the "+" button on map fragment */
     // TODO: add this to ParseCurrentUser
     public void onButtonGroup() {
@@ -207,7 +239,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 if (e == null) {
                     Log.w("add user to relation", "success");
                     // The query was successful.
-                    for (ParseUser user: users) {
+                    for (ParseUser user : users) {
                         Log.w("add user to relation", "there is some user!");
                         relation.add(user);
                     }
@@ -238,7 +270,55 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         //start map holder map view and start map view listener
         mapHolder = (SKMapViewHolder) rootView.findViewById(R.id.map_surface_holder);
         mapHolder.setMapSurfaceListener(this);
-
+        navigateButton = (ImageButton)rootView.findViewById(R.id.navigate_button);
+        navigateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(desCordinate != null) {
+                    if (textToSpeechEngine == null) {
+                        Toast.makeText(getContext(), "Initializing TTS engine",
+                                Toast.LENGTH_LONG).show();
+                        textToSpeechEngine = new TextToSpeech(getContext(),
+                                new TextToSpeech.OnInitListener() {
+                                    @Override
+                                    public void onInit(int status) {
+                                        if (status == TextToSpeech.SUCCESS) {
+                                            int result = textToSpeechEngine.setLanguage(Locale.ENGLISH);
+                                            if (result == TextToSpeech.LANG_MISSING_DATA || result ==
+                                                    TextToSpeech.LANG_NOT_SUPPORTED) {
+                                                Toast.makeText(getContext(),
+                                                        "This Language is not supported",
+                                                        Toast.LENGTH_LONG).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(getContext(), "text to speech not initialize",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                        setAdvicesAndStartNavigation(MapAdvices.TEXT_TO_SPEECH);
+                                    }
+                                });
+                    } else {
+                        setAdvicesAndStartNavigation(MapAdvices.TEXT_TO_SPEECH);
+                    }
+                    // get a route object and populate it with the desired properties
+                    SKRouteSettings route = new SKRouteSettings();
+                    // set start and destination points
+                    route.setStartCoordinate(currentPosition.getCoordinate());
+                    route.setDestinationCoordinate(desCordinate);
+                    // set the number of routes to be calculated
+                    route.setNoOfRoutes(1);
+                    // set the route mode
+                    route.setRouteMode(SKRouteSettings.SKRouteMode.CAR_FASTEST);
+                    // set whether the route should be shown on the map after it's computed
+                    route.setRouteExposed(true);
+                    // set the route listener to be notified of route calculation
+                    // events
+                    SKRouteManager.getInstance().setRouteListener(MapFragment.this);
+                    // pass the route to the calculation routine
+                    SKRouteManager.getInstance().calculateRoute(route);
+                }
+            }
+        });
         //set current position
         currentPositionProvider = new SKCurrentPositionProvider(getActivity());
         currentPositionProvider.setCurrentPositionListener(this);
@@ -306,9 +386,9 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     @Override
     public void onSingleTap(SKScreenPoint skScreenPoint) {
-        SKCoordinate co = mapView.pointToCoordinate(skScreenPoint);
+        desCordinate = mapView.pointToCoordinate(skScreenPoint);
         SKCircle circle = new SKCircle();
-        circle.setCircleCenter(co);
+        circle.setCircleCenter(desCordinate);
 
         float[] out = new float[4];
         out[0] = (float)0.99;
@@ -420,5 +500,115 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             }
         }
         SKPositionerManager.getInstance().reportNewGPSPosition(this.currentPosition);
+    }
+
+    @Override
+    public void onRouteCalculationCompleted(SKRouteInfo skRouteInfo) {
+
+    }
+
+    @Override
+    public void onRouteCalculationFailed(SKRoutingErrorCode skRoutingErrorCode) {
+
+    }
+
+    @Override
+    public void onAllRoutesCompleted() {
+        SKNavigationSettings navigationSettings = new SKNavigationSettings();
+
+        navigationSettings.setNavigationType(SKNavigationSettings.SKNavigationType.SIMULATION);
+
+        SKNavigationManager navigationManager = SKNavigationManager.getInstance();
+        navigationManager.setMapView(mapView);
+        navigationManager.setNavigationListener(this);
+        navigationManager.startNavigation(navigationSettings);
+    }
+
+    @Override
+    public void onServerLikeRouteCalculationCompleted(SKRouteJsonAnswer skRouteJsonAnswer) {
+
+    }
+
+    @Override
+    public void onOnlineRouteComputationHanging(int i) {
+
+    }
+
+    @Override
+    public void onDestinationReached() {
+        if (textToSpeechEngine != null && !textToSpeechEngine.isSpeaking()) {
+            textToSpeechEngine.stop();
+        }
+        SKRouteManager.getInstance().clearCurrentRoute();
+        SKNavigationManager.getInstance().stopNavigation();
+    }
+
+    @Override
+    public void onSignalNewAdviceWithInstruction(String instruction) {
+        textToSpeechEngine.speak(instruction, TextToSpeech.QUEUE_ADD, null);
+    }
+
+    @Override
+    public void onSignalNewAdviceWithAudioFiles(String[] audioFiles, boolean b) {
+        SKToolsAdvicePlayer.getInstance().playAdvice(audioFiles, SKToolsAdvicePlayer.PRIORITY_NAVIGATION);
+    }
+
+    @Override
+    public void onSpeedExceededWithAudioFiles(String[] audioFiles, boolean b) {
+        SKToolsAdvicePlayer.getInstance().playAdvice(audioFiles, SKToolsAdvicePlayer.PRIORITY_NAVIGATION);
+    }
+
+    @Override
+    public void onSpeedExceededWithInstruction(String instruction, boolean b) {
+        textToSpeechEngine.speak(instruction, TextToSpeech.QUEUE_ADD, null);
+    }
+
+    @Override
+    public void onUpdateNavigationState(SKNavigationState skNavigationState) {
+
+    }
+
+    @Override
+    public void onReRoutingStarted() {
+
+    }
+
+    @Override
+    public void onFreeDriveUpdated(String s, String s1, String s2, SKNavigationState.SKStreetType skStreetType, double v, double v1) {
+
+    }
+
+    @Override
+    public void onViaPointReached(int i) {
+
+    }
+
+    @Override
+    public void onVisualAdviceChanged(boolean b, boolean b1, SKNavigationState skNavigationState) {
+
+    }
+
+    @Override
+    public void onTunnelEvent(boolean b) {
+
+    }
+    /**
+     * Setting the audio advices
+     */
+    private void setAdvicesAndStartNavigation(MapAdvices currentMapAdvices) {
+        final SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+        advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_EN);
+        advisorSettings.setAdvisorConfigPath(((MavigationApplication) getActivity().getApplication()).getMapResourcesDirPath() + "/Advisor");
+        advisorSettings.setResourcePath(((MavigationApplication) getActivity().getApplication()).getMapResourcesDirPath() + "/Advisor/Languages");
+        advisorSettings.setAdvisorVoice("en");
+        switch (currentMapAdvices) {
+            case AUDIO_FILES:
+                advisorSettings.setAdvisorType(SKAdvisorSettings.SKAdvisorType.AUDIO_FILES);
+                break;
+            case TEXT_TO_SPEECH:
+                advisorSettings.setAdvisorType(SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+                break;
+        }
+        SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
     }
 }
