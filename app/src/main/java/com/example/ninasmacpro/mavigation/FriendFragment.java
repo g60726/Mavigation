@@ -88,7 +88,15 @@ public class FriendFragment extends Fragment {
 //    FriendListViewAdapter adapter;
     private void getFriendList(){
         ParseUser user = ParseUser.getCurrentUser();
-        ParseRelation<ParseObject> relation = user.getRelation("friends");
+        ParseRelation<ParseUser> relation = user.getRelation("friends");
+//        try{
+//            List<ParseUser> contactObjects = relation.getQuery().find();
+//            for (ParseUser friend: contactObjects){
+//
+//            }
+//        }catch (ParseException e){
+//
+//        }
 
     }
 
