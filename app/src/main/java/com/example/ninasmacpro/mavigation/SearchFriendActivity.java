@@ -49,7 +49,7 @@ public class SearchFriendActivity extends AppCompatActivity {
                 ParseQuery<ParseUser> queryFriend = ParseUser.getQuery();
 //                Log.d("check1", "working");
 //                queryFriend.orderByAscending("username");
-//                queryFriend.whereStartsWith("username", query);
+                queryFriend.whereStartsWith("username", query);
                 queryFriend.findInBackground(new FindCallback<ParseUser>() {
                     public void done(List<ParseUser> friendsList, ParseException e) {
                         if (e == null) {
@@ -71,12 +71,12 @@ public class SearchFriendActivity extends AppCompatActivity {
 //                                Log.e("username is ", username);
 //                                String objectId = (String )friend.getObjectId();
 //                                Log.e("objectId is ", objectId);
-                                String nickname = people.getNickname();
-                                Log.e("nick name is ", nickname);
-                                String username = people.getUsername();
-                                Log.e("username is ", username);
-                                String objectId = people.getObjectId();
-                                Log.e("objectId is ", objectId);
+//                                String nickname = people.getNickname();
+//                                Log.e("nick name is ", nickname);
+//                                String username = people.getUsername();
+//                                Log.e("username is ", username);
+//                                String objectId = people.getObjectId();
+//                                Log.e("objectId is ", objectId);
                                 friendpoopulationlist.add(people);
 //                                lv = (ListView) findViewById(R.id.findFriendListView);
 //                                adapter = new FriendListViewAdapter(SearchFriendActivity.this, friendpoopulationlist);
@@ -85,7 +85,7 @@ public class SearchFriendActivity extends AppCompatActivity {
                             }
                             lv = (ListView) findViewById(R.id.findFriendListView);
                             adapter = new FriendListViewAdapter(SearchFriendActivity.this, friendpoopulationlist);
-//                            lv.setAdapter(adapter);
+                            lv.setAdapter(adapter);
                         } else {
                             Log.w("score", "Error: " + e.getMessage());
                             Log.w("check", "Something went wrong.");
