@@ -25,7 +25,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.skobbler.ngx.SKCoordinate;
 import com.skobbler.ngx.map.SKAnnotation;
+import com.skobbler.ngx.map.SKCircle;
 import com.skobbler.ngx.map.SKCoordinateRegion;
 import com.skobbler.ngx.map.SKMapCustomPOI;
 import com.skobbler.ngx.map.SKMapPOI;
@@ -300,12 +302,30 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     @Override
     public void onDoubleTap(SKScreenPoint skScreenPoint) {
-
     }
 
     @Override
     public void onSingleTap(SKScreenPoint skScreenPoint) {
+        SKCoordinate co = mapView.pointToCoordinate(skScreenPoint);
+        SKCircle circle = new SKCircle();
+        circle.setCircleCenter(co);
 
+        float[] out = new float[4];
+        out[0] = (float)0.99;
+        out[1] = (float)0.553;
+        out[2] = (float)0.016;
+        out[3] = (float)0.6;
+        circle.setOutlineColor(out);
+        float[] in = new float[4];
+        in[0] = (float)0.99;
+        in[1] = (float)0.553;
+        in[2] = (float)0.016;
+        in[3] = (float)0.6;
+        circle.setColor(in);
+        circle.setRadius((float) 4.5);
+        circle.setOutlineSize(100);
+        circle.setMaskedObjectScale((float)2);
+        mapView.addCircle(circle);
     }
 
     @Override

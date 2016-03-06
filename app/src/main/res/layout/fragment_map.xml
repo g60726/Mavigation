@@ -10,5 +10,5 @@
         android:id="@+id/map_surface_holder"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
-
+    
 </FrameLayout>
