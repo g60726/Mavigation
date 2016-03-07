@@ -19,7 +19,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -82,6 +84,7 @@ public class SignUpActivity extends AppCompatActivity {
         String retypePassword = mRetypePasswordView.getText().toString();
         String nickName = mNickNameView.getText().toString();
 
+
         boolean cancel = false;
         View focusView = null;
 
@@ -128,15 +131,27 @@ public class SignUpActivity extends AppCompatActivity {
             // perform the user sign up attempt.
             showProgress(true);
 
-            ParseUser user = new ParseUser();
+            final ParseUser user = new ParseUser();
             user.setEmail(email);
             user.setUsername(email); //user name is the same as email, and is unique
             user.setPassword(password);
             user.put("nickName", nickName);
+            //create user info object
+
 
             user.signUpInBackground(new SignUpCallback() {
                 public void done(ParseException e) {
                     if (e == null) {
+                        final ParseObject userInfo = new ParseObject("UserInfo");
+                        userInfo.saveInBackground(new SaveCallback() {
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    user.put("userInfo", userInfo);
+                                    user.saveInBackground();
+                                } else {
+                                }
+                            }
+                        });
                         // Hooray! Let them use the app now.
                         finish();
                         Intent mapIntent = new Intent(SignUpActivity.this, TabActivity.class);
