@@ -16,7 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -148,6 +150,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     private enum MapAdvices {
         TEXT_TO_SPEECH, AUDIO_FILES
     }
+    /*
+    bool indicate navigation is in progress
+     */
+    private boolean navInProg = false;
     /** the "+" button on map fragment */
     // TODO: add this to ParseCurrentUser
     public void onButtonGroup() {
@@ -296,48 +302,57 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         navigateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(desCordinate != null) {
-                    if (textToSpeechEngine == null) {
-                        Toast.makeText(getContext(), "Initializing TTS engine",
-                                Toast.LENGTH_LONG).show();
-                        textToSpeechEngine = new TextToSpeech(getContext(),
-                                new TextToSpeech.OnInitListener() {
-                                    @Override
-                                    public void onInit(int status) {
-                                        if (status == TextToSpeech.SUCCESS) {
-                                            int result = textToSpeechEngine.setLanguage(Locale.ENGLISH);
-                                            if (result == TextToSpeech.LANG_MISSING_DATA || result ==
-                                                    TextToSpeech.LANG_NOT_SUPPORTED) {
-                                                Toast.makeText(getContext(),
-                                                        "This Language is not supported",
-                                                        Toast.LENGTH_LONG).show();
+                if(!navInProg) {
+                    if (desCordinate != null) {
+                        if (textToSpeechEngine == null) {
+                            Toast.makeText(getContext(), "Initializing TTS engine",
+                                    Toast.LENGTH_LONG).show();
+                            textToSpeechEngine = new TextToSpeech(getContext(),
+                                    new TextToSpeech.OnInitListener() {
+                                        @Override
+                                        public void onInit(int status) {
+                                            if (status == TextToSpeech.SUCCESS) {
+                                                int result = textToSpeechEngine.setLanguage(Locale.ENGLISH);
+                                                if (result == TextToSpeech.LANG_MISSING_DATA || result ==
+                                                        TextToSpeech.LANG_NOT_SUPPORTED) {
+                                                    Toast.makeText(getContext(),
+                                                            "This Language is not supported",
+                                                            Toast.LENGTH_LONG).show();
+                                                }
+                                            } else {
+                                                Toast.makeText(getContext(), "text to speech not initialize",
+                                                        Toast.LENGTH_SHORT).show();
                                             }
-                                        } else {
-                                            Toast.makeText(getContext(), "text to speech not initialize",
-                                                    Toast.LENGTH_SHORT).show();
+                                            setAdvicesAndStartNavigation(MapAdvices.TEXT_TO_SPEECH);
                                         }
-                                        setAdvicesAndStartNavigation(MapAdvices.TEXT_TO_SPEECH);
-                                    }
-                                });
-                    } else {
-                        setAdvicesAndStartNavigation(MapAdvices.TEXT_TO_SPEECH);
+                                    });
+                        } else {
+                            setAdvicesAndStartNavigation(MapAdvices.TEXT_TO_SPEECH);
+                        }
+                        // get a route object and populate it with the desired properties
+                        SKRouteSettings route = new SKRouteSettings();
+                        // set start and destination points
+                        route.setStartCoordinate(currentPosition.getCoordinate());
+                        route.setDestinationCoordinate(desCordinate);
+                        // set the number of routes to be calculated
+                        route.setNoOfRoutes(1);
+                        // set the route mode
+                        route.setRouteMode(SKRouteSettings.SKRouteMode.CAR_FASTEST);
+                        // set whether the route should be shown on the map after it's computed
+                        route.setRouteExposed(true);
+                        // set the route listener to be notified of route calculation
+                        // events
+                        SKRouteManager.getInstance().setRouteListener(MapFragment.this);
+                        // pass the route to the calculation routine
+                        SKRouteManager.getInstance().calculateRoute(route);
+                        navInProg = true;
+                        navigateButton.setBackgroundResource(R.drawable.stop_navigation);
+
                     }
-                    // get a route object and populate it with the desired properties
-                    SKRouteSettings route = new SKRouteSettings();
-                    // set start and destination points
-                    route.setStartCoordinate(currentPosition.getCoordinate());
-                    route.setDestinationCoordinate(desCordinate);
-                    // set the number of routes to be calculated
-                    route.setNoOfRoutes(1);
-                    // set the route mode
-                    route.setRouteMode(SKRouteSettings.SKRouteMode.CAR_FASTEST);
-                    // set whether the route should be shown on the map after it's computed
-                    route.setRouteExposed(true);
-                    // set the route listener to be notified of route calculation
-                    // events
-                    SKRouteManager.getInstance().setRouteListener(MapFragment.this);
-                    // pass the route to the calculation routine
-                    SKRouteManager.getInstance().calculateRoute(route);
+                }else{
+                    //in navigation must be the stop button
+                    stopNavigtion();
+
                 }
             }
         });
@@ -568,11 +583,8 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     @Override
     public void onDestinationReached() {
-        if (textToSpeechEngine != null && !textToSpeechEngine.isSpeaking()) {
-            textToSpeechEngine.stop();
-        }
-        SKRouteManager.getInstance().clearCurrentRoute();
-        SKNavigationManager.getInstance().stopNavigation();
+        stopNavigtion();
+
     }
 
     @Override
@@ -642,5 +654,14 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 break;
         }
         SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
+    }
+    private void stopNavigtion(){
+        if (textToSpeechEngine != null && !textToSpeechEngine.isSpeaking()) {
+            textToSpeechEngine.stop();
+        }
+        navInProg = false;
+        SKRouteManager.getInstance().clearCurrentRoute();
+        SKNavigationManager.getInstance().stopNavigation();
+        navigateButton.setBackgroundResource(R.drawable.navigate);
     }
 }
