@@ -26,15 +26,15 @@ import java.util.List;
 /**
  * Created by zhengyu on 16-02-20.
  */
-public class FriendListViewAdapter extends BaseAdapter {
+public class ListFriendViewAdapter extends BaseAdapter {
     Context context;
     LayoutInflater inflater;
 
     private List<Population> friendPopulation = null;
     private ArrayList<Population> arraylist;
 
-    public FriendListViewAdapter(Context context,
-                           List<Population> friendPopulation) {
+    public ListFriendViewAdapter(Context context,
+                                 List<Population> friendPopulation) {
         this.context = context;
         this.friendPopulation = friendPopulation;
         inflater = LayoutInflater.from(context);
@@ -67,7 +67,7 @@ public class FriendListViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
         if(convertView == null){
             holder = new ViewHolder();
@@ -87,43 +87,43 @@ public class FriendListViewAdapter extends BaseAdapter {
         holder.nickname.setText(nickname);
         holder.objectId = friendPopulation.get(position).getObjectId();
         // Listen for ListView Item Click
-        convertView.setOnClickListener(new View.OnClickListener() {
-            private String TAG = "in the friend list view page";
+        convertView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                showFriendConfirmDialog(v, nickname, objectId);
-                Log.i(TAG, "onClick: loading... ");
+            public boolean onLongClick(View view) {
+                deleteFriendConfirmDialog(view, nickname, objectId, position);
+                Log.i("in friend list", "on long Click: loading... 23333 ");
+
+                return false;
+
             }
         });
         return convertView;
     }
 
+
+
     private AlertDialog.Builder builder;
-    private void showFriendConfirmDialog(final View view, String nickname, final String objectId){
+    private void deleteFriendConfirmDialog(final View view, String nickname, final String objectId, final int position){
         builder=new AlertDialog.Builder(view.getContext());
         builder.setIcon(R.mipmap.ic_launcher);
-        builder.setTitle("Follow");
-        builder.setMessage("Are you sure you want to add " + nickname);
+        builder.setTitle("Unfriend");
+        builder.setMessage("Are you sure you want to delete contact " + nickname);
 
         //listen to yes/no
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-//                Toast.makeText(getApplicationContext(), R.string.toast_negative, Toast.LENGTH_SHORT).show();
-
             }
         });
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-//                Toast.makeText(getApplicationContext(),R.string.toast_postive, Toast.LENGTH_SHORT).show();
                 ParseUser user = ParseUser.getCurrentUser();
                 ParseRelation<ParseObject> relation = user.getRelation("friends");
-//                ParseUser friend = new ParseUser();
-                relation.add(ParseObject.createWithoutData("_User", objectId));
+                relation.remove(ParseObject.createWithoutData("_User", objectId));
                 user.saveInBackground(new SaveCallback() {
                     public void done(ParseException e){
-                        showCallBackInfo(view);
+                        showCallBackInfo(view, position);
                     }
                 });
                 Log.i("add friend", " successful");
@@ -136,30 +136,20 @@ public class FriendListViewAdapter extends BaseAdapter {
         dialog.show();
 
     }
-    private void showCallBackInfo(View view){
-//        AlertDialog alertDialog = new AlertDialog.Builder(view.getContext()).create();
-//        alertDialog.setTitle("Alert Dialog");
-//        alertDialog.setMessage("Welcome to dear user.");
-//        alertDialog.setIcon(R.mipmap.ic_launcher);
-//
-//        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int which) {
-//                Toast.makeText(getApplicationContext(), "You clicked on OK", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+    private void showCallBackInfo(View view, final int position){
 
-//        alertDialog.show();
         AlertDialog.Builder alert;
         alert=new AlertDialog.Builder(view.getContext());
         alert.setIcon(R.mipmap.ic_launcher);
-        alert.setTitle("Add friend");
+        alert.setTitle("Delete Contact");
         alert.setMessage("successfully");
         alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-//                Toast.makeText(getApplicationContext(),R.string.toast_postive, Toast.LENGTH_SHORT).show();
-                Log.i("add friend", " successful");
-
+                Log.i("Delete Contact", " successful");
+//                refreshFriendList();
+                friendPopulation.remove(position);
+                notifyDataSetChanged();
 
             }
         });

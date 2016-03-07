@@ -78,10 +78,6 @@ public class SearchFriendActivity extends AppCompatActivity {
 //                                String objectId = people.getObjectId();
 //                                Log.e("objectId is ", objectId);
                                 friendpoopulationlist.add(people);
-//                                lv = (ListView) findViewById(R.id.findFriendListView);
-//                                adapter = new FriendListViewAdapter(SearchFriendActivity.this, friendpoopulationlist);
-//                                lv.setAdapter(adapter);
-
                             }
                             lv = (ListView) findViewById(R.id.findFriendListView);
                             adapter = new FriendListViewAdapter(SearchFriendActivity.this, friendpoopulationlist);
