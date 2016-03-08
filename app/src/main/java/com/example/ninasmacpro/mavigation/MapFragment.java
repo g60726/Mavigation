@@ -167,7 +167,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             Intent intent = new Intent(getActivity(), GroupActivity.class); //TODO: change this to a diff class?
             intent.putExtra("hasGroup", hasGroup);
             intent.putExtra("groupName", mGroupName);
-            intent.putStringArrayListExtra("currentGroupMember", mGroupMemberObjectId);
+            intent.putStringArrayListExtra("currentGroupMemberObjectId", mGroupMemberObjectId);
             startActivityForResult(intent, REQUEST_CODE_ADD_PEOPLE_TO_GROUP);
         }
     }

@@ -56,7 +56,8 @@ public class GroupActivity extends AppCompatActivity {
         if (hasGroup) { // if there's a group, show group name in EditText
             mGroupName = bundle.getString("groupName");
             mGroupNameEditText.setText(mGroupName);
-            currentGroupMemberObjectId = bundle.getStringArrayList("currentGroupMember");
+            currentGroupMemberObjectId = bundle.getStringArrayList("currentGroupMemberObjectId");
+            mLeaveGroupButton.setVisibility(View.VISIBLE);
         } else {
             mLeaveGroupButton.setVisibility(View.GONE);
         }
