@@ -67,7 +67,13 @@
                 android:id="@+id/findSelected"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add friends into group" />
+                android:text="Add friends into group"/>
+
+            <Button
+                android:id="@+id/LeaveGroupButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Leave Current Group"/>
         </LinearLayout>
 
     </RelativeLayout>

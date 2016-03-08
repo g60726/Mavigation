@@ -21,11 +21,11 @@
             android:layout_height="wrap_content"
             android:text="nickName"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Leave Group"
-            android:id="@+id/LeaveGroupButton" />
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Leave Group"-->
+            <!--android:id="@+id/LeaveGroupButton" />-->
 
         <Button
             android:layout_width="wrap_content"
