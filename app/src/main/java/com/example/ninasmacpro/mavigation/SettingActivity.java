@@ -8,13 +8,16 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.parse.ParseUser;
+import com.skobbler.ngx.map.SKMapSettings;
+import com.skobbler.ngx.navigation.SKNavigationSettings;
 
 public class SettingActivity extends AppCompatActivity {
 
     private Button logOutButton;
     private TextView nickNameTextView;
     private TextView leaveGroupTextView;
-
+    private Button simButton;
+    private Button realButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -23,7 +26,8 @@ public class SettingActivity extends AppCompatActivity {
         logOutButton = (Button) findViewById(R.id.logOutButton);
         nickNameTextView = (TextView) findViewById(R.id.nickNameTextView);
         leaveGroupTextView = (Button) findViewById(R.id.LeaveGroupButton);
-
+        simButton = (Button) findViewById(R.id.button_sim);
+        realButton = (Button) findViewById(R.id.button_real);
         String nickName = (String) ParseUser.getCurrentUser().get("nickName");
         nickNameTextView.setText(nickName);
 
@@ -45,5 +49,20 @@ public class SettingActivity extends AppCompatActivity {
                 startActivity(mainIntent);
             }
         });
+        simButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setNavigationType(SKNavigationSettings.SKNavigationType.SIMULATION);
+            }
+        });
+        realButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setNavigationType(SKNavigationSettings.SKNavigationType.REAL);
+            }
+        });
+    }
+    private void setNavigationType(SKNavigationSettings.SKNavigationType type){
+        ((MavigationApplication)getApplication()).setNavigationType(type);
     }
 }

@@ -302,7 +302,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         navigateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!navInProg) {
+                if(!navInProg && currentPosition != null) {
                     if (desCordinate != null) {
                         if (textToSpeechEngine == null) {
                             Toast.makeText(getContext(), "Initializing TTS engine",
@@ -395,6 +395,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     public void onSurfaceCreated(SKMapViewHolder skMapViewHolder) {
 
         mapView = mapHolder.getMapSurfaceView();
+        mapView.clearAllOverlays();
         if(currentPosition != null){
             mapView.centerMapOnPosition(currentPosition.getCoordinate());
             start=false;
@@ -433,10 +434,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     @Override
     public void onSingleTap(SKScreenPoint skScreenPoint) {
+        
         desCordinate = mapView.pointToCoordinate(skScreenPoint);
         SKCircle circle = new SKCircle();
         circle.setCircleCenter(desCordinate);
-
         float[] out = new float[4];
         out[0] = (float)0.99;
         out[1] = (float)0.553;
@@ -563,7 +564,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     public void onAllRoutesCompleted() {
         SKNavigationSettings navigationSettings = new SKNavigationSettings();
 
-        navigationSettings.setNavigationType(SKNavigationSettings.SKNavigationType.SIMULATION);
+        navigationSettings.setNavigationType(((MavigationApplication)getActivity().getApplication()).getNavigationType());
 
         SKNavigationManager navigationManager = SKNavigationManager.getInstance();
         navigationManager.setMapView(mapView);
@@ -609,7 +610,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     @Override
     public void onUpdateNavigationState(SKNavigationState skNavigationState) {
-
+            System.out.println(skNavigationState.getDistanceToDestination());
     }
 
     @Override
@@ -656,7 +657,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
     }
     private void stopNavigtion(){
-        if (textToSpeechEngine != null && !textToSpeechEngine.isSpeaking()) {
+        if (textToSpeechEngine != null) {
             textToSpeechEngine.stop();
         }
         navInProg = false;

@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.skobbler.ngx.navigation.SKNavigationSettings;
+
 /**
  * Created by ninasmacpro on 16/2/6.
  */
@@ -25,6 +27,19 @@ public class MavigationApplication extends Application {
      * Object for accessing application preferences
      */
     private ApplicationPreferences appPrefs;
+
+    /**
+     * object for the naviagation mode selection
+     */
+    private SKNavigationSettings.SKNavigationType navigationType= SKNavigationSettings.SKNavigationType.SIMULATION;
+
+    public SKNavigationSettings.SKNavigationType getNavigationType() {
+        return navigationType;
+    }
+
+    public void setNavigationType(SKNavigationSettings.SKNavigationType navigationType) {
+        this.navigationType = navigationType;
+    }
 
     public void Application() {
     }
