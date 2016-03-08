@@ -654,7 +654,14 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     @Override
     public void onUpdateNavigationState(SKNavigationState skNavigationState) {
-            System.out.println(skNavigationState.getDistanceToDestination());
+        double distance = skNavigationState.getDistanceToDestination();
+        double speed = skNavigationState.getCurrentSpeed();
+        if(speed != 0) {
+            // write estimationTime in minutes
+            mUserInfo.put("estimationTime", distance/speed/60);
+        }else if(distance==0){
+            mUserInfo.put("estimationTime", 0);
+        }
     }
 
     @Override
