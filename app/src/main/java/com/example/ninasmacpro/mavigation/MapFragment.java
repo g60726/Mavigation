@@ -265,8 +265,8 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
         // get current Parse user and its pointer to user info
         mParseUser = ParseUser.getCurrentUser();
-        //add user info
         mUserInfo = mParseUser.getParseObject("userInfo");
+
         // check if user is in a group
         mGroupObjectId = (String) mParseUser.get("groupObjectId");
         if (mGroupObjectId != null && mGroupObjectId != "") {

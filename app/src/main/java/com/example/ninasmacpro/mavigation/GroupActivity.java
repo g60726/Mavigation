@@ -75,8 +75,8 @@ public class GroupActivity extends AppCompatActivity {
             public void done(List<ParseUser> users, ParseException e) {
                 if (e == null) {
                     mParseObjectFriends = users;
-                    displayListViews(); // once we get a list of friends, display them
-                    checkButtonClick();
+                    displayListViews(); // once we get lists of friends/group members, display them
+                    checkButtonsClick(); // only check buttons click after we get lists of friends/group members
                 } else {
                     // Something went wrong.
                 }
@@ -203,7 +203,7 @@ public class GroupActivity extends AppCompatActivity {
 
     }
 
-    private void checkButtonClick() {
+    private void checkButtonsClick() {
         Button addFriendButton = (Button) findViewById(R.id.findSelected);
         addFriendButton.setOnClickListener(new View.OnClickListener() {
 
