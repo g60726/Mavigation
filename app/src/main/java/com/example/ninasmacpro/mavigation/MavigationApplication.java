@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.parse.Parse;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.skobbler.ngx.navigation.SKNavigationSettings;
 
@@ -50,6 +51,7 @@ public class MavigationApplication extends Application {
         appPrefs = new ApplicationPreferences(this);
         Parse.enableLocalDatastore(this);
         Parse.initialize(this);
+        ParseInstallation.getCurrentInstallation().saveInBackground();
     }
     public void setMapResourcesDirPath(String mapResourcesDirPath) {
         this.mapResourcesDirPath = mapResourcesDirPath;

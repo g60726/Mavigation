@@ -13,12 +13,19 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +96,7 @@ public class FriendListViewAdapter extends BaseAdapter {
         // Listen for ListView Item Click
         convertView.setOnClickListener(new View.OnClickListener() {
             private String TAG = "in the friend list view page";
+
             @Override
             public void onClick(View v) {
                 showFriendConfirmDialog(v, nickname, objectId);
@@ -99,7 +107,7 @@ public class FriendListViewAdapter extends BaseAdapter {
     }
 
     private AlertDialog.Builder builder;
-    private void showFriendConfirmDialog(final View view, String nickname, final String objectId){
+    private void showFriendConfirmDialog(final View view, final String nickname, final String objectId){
         builder=new AlertDialog.Builder(view.getContext());
         builder.setIcon(R.mipmap.ic_launcher);
         builder.setTitle("Follow");
@@ -117,17 +125,15 @@ public class FriendListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 //                Toast.makeText(getApplicationContext(),R.string.toast_postive, Toast.LENGTH_SHORT).show();
-                ParseUser user = ParseUser.getCurrentUser();
+                final ParseUser user = ParseUser.getCurrentUser();
                 ParseRelation<ParseObject> relation = user.getRelation("friends");
-//                ParseUser friend = new ParseUser();
                 relation.add(ParseObject.createWithoutData("_User", objectId));
                 user.saveInBackground(new SaveCallback() {
-                    public void done(ParseException e){
+                    public void done(ParseException e) {
                         showCallBackInfo(view);
+                        sendFriendRequest(objectId, user.getUsername());
                     }
                 });
-                Log.i("add friend", " successful");
-
             }
         });
 
@@ -136,19 +142,28 @@ public class FriendListViewAdapter extends BaseAdapter {
         dialog.show();
 
     }
-    private void showCallBackInfo(View view){
-//        AlertDialog alertDialog = new AlertDialog.Builder(view.getContext()).create();
-//        alertDialog.setTitle("Alert Dialog");
-//        alertDialog.setMessage("Welcome to dear user.");
-//        alertDialog.setIcon(R.mipmap.ic_launcher);
-//
-//        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int which) {
-//                Toast.makeText(getApplicationContext(), "You clicked on OK", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+    private void sendFriendRequest(String contactObjectId, String nickname){
+        ParseQuery pushQuery = ParseInstallation.getQuery();
+        pushQuery.whereEqualTo("user", contactObjectId);
+        String message = nickname + " want to add you";
+        try{
+//            JSONObject data = new JSONObject("{\"alert\": \"xxxx want to add you!!!\"}");
+            JSONObject data = new JSONObject();
+            data.put("alert", message);
+//            JSONObject data = new JSONObject("{\"alert\": \"xxxx want to add you!\",\"uri\": \"myapp://host/path\"}");
 
-//        alertDialog.show();
+            ParsePush push = new ParsePush();
+            push.setQuery(pushQuery); // Set our Installation query
+//            push.setMessage("xxxx want to add you");
+            push.setData(data);
+//            push.sendPushInBackground();
+            push.sendInBackground();
+        }catch (Exception e){
+            Log.i("debug3", "jason data type went wrong");
+        }
+
+    }
+    private void showCallBackInfo(View view){
         AlertDialog.Builder alert;
         alert=new AlertDialog.Builder(view.getContext());
         alert.setIcon(R.mipmap.ic_launcher);

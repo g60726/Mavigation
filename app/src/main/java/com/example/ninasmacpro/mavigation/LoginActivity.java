@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 /**
@@ -114,6 +115,9 @@ public class LoginActivity extends AppCompatActivity {
                     if (user != null) {
                         // Hooray! The user is logged in.
                         finish();
+                        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                        installation.put("user",ParseUser.getCurrentUser().getObjectId());
+                        installation.saveInBackground();
                         Intent mapIntent = new Intent(LoginActivity.this, TabActivity.class);
                         startActivity(mapIntent);
                     } else {

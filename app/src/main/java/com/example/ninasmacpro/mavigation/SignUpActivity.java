@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -148,6 +149,9 @@ public class SignUpActivity extends AppCompatActivity {
                                 if (e == null) {
                                     user.put("userInfo", userInfo);
                                     user.saveInBackground();
+                                    ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                                    installation.put("user",ParseUser.getCurrentUser().getObjectId());
+                                    installation.saveInBackground();
                                 } else {
                                 }
                             }
