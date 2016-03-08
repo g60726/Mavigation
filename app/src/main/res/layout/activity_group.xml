@@ -53,6 +53,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:text="Current group members: "
+                    android:textColor="#0a1903"
+                    android:textSize="20sp"/>
+                <ListView
+                    android:id="@+id/currentGroupList"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="Select friends: "
                     android:textColor="#0a1903"
                     android:textSize="20sp"/>

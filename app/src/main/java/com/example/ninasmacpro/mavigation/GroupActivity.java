@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,9 +35,10 @@ public class GroupActivity extends AppCompatActivity {
     private boolean hasGroup = false;
     private String mGroupName = "";
     ArrayList<Friend> mFriends = new ArrayList<Friend>();
-    ArrayList<String> currentGroupMember = new ArrayList<String>(); // a list of ObjectId
+    ArrayList<String> currentGroupMemberObjectId = new ArrayList<String>(); // a list of ObjectId
 
     private Button mLeaveGroupButton;
+    private ListView mCurrentGroupMemberListView;
 
 
     @Override
@@ -49,13 +49,14 @@ public class GroupActivity extends AppCompatActivity {
         mGroupNameEditText = (EditText) findViewById(R.id.groupNameEditText);
         mLeaveGroupButton = (Button) findViewById(R.id.LeaveGroupButton);
 
+
         Bundle bundle = getIntent().getExtras();
         hasGroup = bundle.getBoolean("hasGroup");
 
         if (hasGroup) { // if there's a group, show group name in EditText
             mGroupName = bundle.getString("groupName");
             mGroupNameEditText.setText(mGroupName);
-            currentGroupMember = bundle.getStringArrayList("currentGroupMember");
+            currentGroupMemberObjectId = bundle.getStringArrayList("currentGroupMember");
         } else {
             mLeaveGroupButton.setVisibility(View.GONE);
         }
@@ -65,7 +66,7 @@ public class GroupActivity extends AppCompatActivity {
 
     }
 
-    // get user's friends from Parse FIXME: is this working?
+    // get user's friends from Parse
     private void getFriends() {
         ParseRelation friendsRelation = mParseUser.getRelation("friends");
         ParseQuery<ParseUser> query = friendsRelation.getQuery();
@@ -73,7 +74,7 @@ public class GroupActivity extends AppCompatActivity {
             public void done(List<ParseUser> users, ParseException e) {
                 if (e == null) {
                     mParseObjectFriends = users;
-                    displayListView(); // once we get a list of friends, display them
+                    displayListViews(); // once we get a list of friends, display them
                     checkButtonClick();
                 } else {
                     // Something went wrong.
@@ -82,30 +83,33 @@ public class GroupActivity extends AppCompatActivity {
         });
     }
 
-    // display a list of friends
-    private void displayListView() {
-
+    // display a list of friends, and a list of current group members
+    private void displayListViews() {
         mFriends = new ArrayList<Friend>();
+        ArrayList<String> currentGroupMember = new ArrayList<String>();
         for (ParseUser parseObjectFriend: mParseObjectFriends) {
             String currentObjectId = parseObjectFriend.getObjectId();
-            if (!currentGroupMember.contains(currentObjectId)) {
+            if (!currentGroupMemberObjectId.contains(currentObjectId)) { // put to list of friends
                 Friend friend = new Friend(currentObjectId, parseObjectFriend.getEmail(),
                         (String) parseObjectFriend.get("nickName"), false);
                 mFriends.add(friend);
+            } else { // put to list of current group members
+                StringBuilder temp = new StringBuilder();
+                temp.append((String) parseObjectFriend.get("nickName"));
+                temp.append(" (");
+                temp.append(parseObjectFriend.getEmail());
+                temp.append(")");
+                currentGroupMember.add(temp.toString());
+                mCurrentGroupMemberListView = (ListView) findViewById(R.id.currentGroupList);
+                ArrayAdapter<String> currentGroupMemberAdapter = new ArrayAdapter<String>(this,
+                        R.layout.group_current_member_list_layout, R.id.code2, currentGroupMember);
+                mCurrentGroupMemberListView.setAdapter(currentGroupMemberAdapter);
             }
 
         }
-        mAdapter = new MyCustomAdapter(this, R.layout.group_list_layout, mFriends);
+        mAdapter = new MyCustomAdapter(this, R.layout.group_friend_list_layout, mFriends);
         mFriendsList = (ListView) findViewById(R.id.friendList);
         mFriendsList.setAdapter(mAdapter);
-
-        /*
-        mFriendsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //not used
-            }
-        });
-        */
 
     }
 
@@ -168,7 +172,7 @@ public class GroupActivity extends AppCompatActivity {
             if (convertView == null) {
                 LayoutInflater vi = (LayoutInflater)getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
-                convertView = vi.inflate(R.layout.group_list_layout, null);
+                convertView = vi.inflate(R.layout.group_friend_list_layout, null);
 
                 holder = new ViewHolder();
                 holder.code = (TextView) convertView.findViewById(R.id.code);
