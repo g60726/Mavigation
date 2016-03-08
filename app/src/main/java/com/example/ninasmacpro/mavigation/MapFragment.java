@@ -258,7 +258,8 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
         // get current Parse user and its pointer to user info
         mParseUser = ParseUser.getCurrentUser();
-
+        //add user info
+        mUserInfo = mParseUser.getParseObject("userInfo");
         // check if user is in a group
         mGroupObjectId = (String) mParseUser.get("groupObjectId");
         if (mGroupObjectId != null) {
@@ -548,6 +549,9 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 this.start=false;
             }
         }
+        mUserInfo.put("longitude",this.currentPosition.getCoordinate().getLongitude());
+        mUserInfo.put("latitude",this.currentPosition.getCoordinate().getLatitude());
+        mUserInfo.saveInBackground();
         SKPositionerManager.getInstance().reportNewGPSPosition(this.currentPosition);
     }
 
