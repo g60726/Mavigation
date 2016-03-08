@@ -15,9 +15,10 @@ public class SettingActivity extends AppCompatActivity {
 
     private Button logOutButton;
     private TextView nickNameTextView;
-    private TextView leaveGroupTextView;
+
     private Button simButton;
     private Button realButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -25,18 +26,13 @@ public class SettingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
         logOutButton = (Button) findViewById(R.id.logOutButton);
         nickNameTextView = (TextView) findViewById(R.id.nickNameTextView);
-        leaveGroupTextView = (Button) findViewById(R.id.LeaveGroupButton);
+
         simButton = (Button) findViewById(R.id.button_sim);
         realButton = (Button) findViewById(R.id.button_real);
+
         String nickName = (String) ParseUser.getCurrentUser().get("nickName");
         nickNameTextView.setText(nickName);
 
-        leaveGroupTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // not used
-            }
-        });
 
         logOutButton.setOnClickListener(new View.OnClickListener(){
 

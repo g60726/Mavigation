@@ -38,6 +38,8 @@ public class GroupActivity extends AppCompatActivity {
     ArrayList<Friend> mFriends = new ArrayList<Friend>();
     ArrayList<String> currentGroupMember = new ArrayList<String>(); // a list of ObjectId
 
+    private Button mLeaveGroupButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class GroupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_group);
 
         mGroupNameEditText = (EditText) findViewById(R.id.groupNameEditText);
+        mLeaveGroupButton = (Button) findViewById(R.id.LeaveGroupButton);
 
         Bundle bundle = getIntent().getExtras();
         hasGroup = bundle.getBoolean("hasGroup");
@@ -53,6 +56,8 @@ public class GroupActivity extends AppCompatActivity {
             mGroupName = bundle.getString("groupName");
             mGroupNameEditText.setText(mGroupName);
             currentGroupMember = bundle.getStringArrayList("currentGroupMember");
+        } else {
+            mLeaveGroupButton.setVisibility(View.GONE);
         }
 
         mParseUser = ParseUser.getCurrentUser();
@@ -194,8 +199,8 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void checkButtonClick() {
-        Button myButton = (Button) findViewById(R.id.findSelected);
-        myButton.setOnClickListener(new View.OnClickListener() {
+        Button addFriendButton = (Button) findViewById(R.id.findSelected);
+        addFriendButton.setOnClickListener(new View.OnClickListener() {
 
             // once clicked, add all selected friends into group and back to MapFragment
             @Override
@@ -216,9 +221,8 @@ public class GroupActivity extends AppCompatActivity {
                     focusView.requestFocus();
                 } else {
                     Intent intent = new Intent();
-
-
                     intent.putExtra("groupName", mGroupName); // pass in groupName
+                    intent.putExtra("leaveGroup", false);
 
                     // pass in all the selected friends' objectIds
                     ArrayList<String> selectedFriends = new ArrayList<String>();
@@ -236,6 +240,17 @@ public class GroupActivity extends AppCompatActivity {
             }
         });
 
+        if (mLeaveGroupButton != null) {
+            mLeaveGroupButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent();
+                    intent.putExtra("leaveGroup", true);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            });
+        }
     }
 
 }

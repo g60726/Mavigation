@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -194,9 +195,15 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         } else if (requestCode == REQUEST_CODE_ADD_PEOPLE_TO_GROUP) {
             if (Activity.RESULT_OK == resultCode) {
                 Bundle bundle = data.getExtras();
-                mGroupName = bundle.getString("groupName"); // user may have changed group name
-                ArrayList<String> newGroupMemberObjectId = bundle.getStringArrayList("groupMemberObjectId");
-                addToCurrentGroup(newGroupMemberObjectId);
+                boolean leaveGroup = bundle.getBoolean("leaveGroup");
+
+                if (leaveGroup) {
+                    leaveCurrentGroup();
+                } else {
+                    mGroupName = bundle.getString("groupName"); // user may have changed group name
+                    ArrayList<String> newGroupMemberObjectId = bundle.getStringArrayList("groupMemberObjectId");
+                    addToCurrentGroup(newGroupMemberObjectId);
+                }
             } else {
                 // now used now
             }
@@ -235,7 +242,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             public void done(List<ParseUser> users, ParseException e) {
                 if (e == null) {
                     // The query was successful.
-                    for (ParseUser user: users) {
+                    for (ParseUser user : users) {
                         relation.add(user);
                     }
                     mGroupOnParse.saveInBackground(new SaveCallback() {
@@ -262,7 +269,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         mUserInfo = mParseUser.getParseObject("userInfo");
         // check if user is in a group
         mGroupObjectId = (String) mParseUser.get("groupObjectId");
-        if (mGroupObjectId != null) {
+        if (mGroupObjectId != null && mGroupObjectId != "") {
             // get Group object
             ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
             query.getInBackground(mGroupObjectId, new GetCallback<ParseObject>() {
@@ -350,7 +357,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                         navigateButton.setBackgroundResource(R.drawable.stop_navigation);
 
                     }
-                }else{
+                } else {
                     //in navigation must be the stop button
                     stopNavigtion();
 
@@ -371,14 +378,43 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
         // update ParseUser on Parse
         mGroupObjectId = null;
-        mParseUser.put("groupObjectId", null);
+        mParseUser.put("groupObjectId", "");
         mParseUser.saveInBackground();
 
         // update Group on Parse
-        mGroupOnParse = null;
         ParseRelation<ParseUser> updateGroup = mGroupOnParse.getRelation("members");
-        updateGroup.remove(mParseUser); // FIXME: will this work?
-        mGroupOnParse.saveInBackground();
+
+        try {
+            List<ParseUser> groupMember = updateGroup.getQuery().find();
+            Log.w("group member list", groupMember.toString());
+            if (groupMember.size() == 1) {
+                Log.w("delete", " enter delete group");
+                mGroupOnParse.deleteInBackground(new DeleteCallback() {
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Log.w("delete", " succeed delete group");
+                            mGroupOnParse = null;
+                        } else {
+                            // not used
+                        }
+                    }
+                });
+            } else {
+                updateGroup.remove(mParseUser); // FIXME: will this work?
+                mGroupOnParse.saveInBackground(new SaveCallback() {
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            mGroupOnParse = null;
+                        } else {
+                            // not used
+                        }
+                    }
+                });
+            }
+        } catch (ParseException e2) {
+
+        }
+
 
     }
 
@@ -549,9 +585,12 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 this.start=false;
             }
         }
-        mUserInfo.put("longitude",this.currentPosition.getCoordinate().getLongitude());
-        mUserInfo.put("latitude",this.currentPosition.getCoordinate().getLatitude());
-        mUserInfo.saveInBackground();
+        if (mUserInfo != null) {
+            mUserInfo.put("longitude",this.currentPosition.getCoordinate().getLongitude());
+            mUserInfo.put("latitude",this.currentPosition.getCoordinate().getLatitude());
+            mUserInfo.saveInBackground();
+        }
+
         SKPositionerManager.getInstance().reportNewGPSPosition(this.currentPosition);
     }
 
