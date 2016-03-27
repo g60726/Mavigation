@@ -1,24 +1,20 @@
 package com.example.ninasmacpro.mavigation;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
+import android.location.Address;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.DeleteCallback;
@@ -31,7 +27,9 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.skobbler.ngx.SKCoordinate;
+import com.skobbler.ngx.map.SKAnimationSettings;
 import com.skobbler.ngx.map.SKAnnotation;
+import com.skobbler.ngx.map.SKCalloutView;
 import com.skobbler.ngx.map.SKCircle;
 import com.skobbler.ngx.map.SKCoordinateRegion;
 import com.skobbler.ngx.map.SKMapCustomPOI;
@@ -55,12 +53,13 @@ import com.skobbler.ngx.routing.SKRouteJsonAnswer;
 import com.skobbler.ngx.routing.SKRouteListener;
 import com.skobbler.ngx.routing.SKRouteManager;
 import com.skobbler.ngx.routing.SKRouteSettings;
-import com.skobbler.ngx.util.SKLogging;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -155,6 +154,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     bool indicate navigation is in progress
      */
     private boolean navInProg = false;
+    /*
+    search button
+     */
+    private Button searchButton;
     /** the "+" button on map fragment */
     // TODO: add this to ParseCurrentUser
     public void onButtonGroup() {
@@ -283,7 +286,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                             ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
                             try {
                                 List<ParseUser> groupMember = temp.getQuery().find();
-                                for (ParseUser temp2: groupMember) {
+                                for (ParseUser temp2 : groupMember) {
                                     Log.w("getGroupObject", temp2.getObjectId());
                                     mGroupMemberObjectId.add(temp2.getObjectId());
                                 }
@@ -298,7 +301,14 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             });
         }
     }
-
+    //map text
+    private TextView annText;
+    //map pop up view
+    private View popUpView;
+    //map pop up text
+    private SKCalloutView mapPopup;
+    //Map annotation to display text hash table
+    private Map<Integer,String> annTextMap;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -306,11 +316,18 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         //start map holder map view and start map view listener
         mapHolder = (SKMapViewHolder) rootView.findViewById(R.id.map_surface_holder);
         mapHolder.setMapSurfaceListener(this);
+       //map popup text view
+        popUpView = inflater.inflate(R.layout.annotation_layout, null);
+        annText = (TextView)popUpView.findViewById(R.id.textAnnotation);
+        mapPopup = mapHolder.getCalloutView();
+        mapPopup.setCustomView(popUpView);
+        //initiate ann text map
+        annTextMap = new HashMap<>();
         navigateButton = (ImageButton)rootView.findViewById(R.id.navigate_button);
         navigateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!navInProg && currentPosition != null) {
+                if (!navInProg && currentPosition != null) {
                     if (desCordinate != null) {
                         if (textToSpeechEngine == null) {
                             Toast.makeText(getContext(), "Initializing TTS engine",
@@ -362,6 +379,16 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                     stopNavigtion();
 
                 }
+            }
+        });
+        //search button
+        searchButton = (Button) rootView.findViewById(R.id.searchButton);
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AdressSearch.class);
+                startActivity(intent);
             }
         });
         //set current position
@@ -427,16 +454,31 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     public void onActionZoom() {
 
     }
+    //add annotation
+    private void addAnnotation(String text,SKCoordinate coordinate,int id){
+        if(mapView!=null){
+            annTextMap.put(id, text);
 
+            SKAnnotation ann = new SKAnnotation(0);
+            ann.setMininumZoomLevel(5);
+            ann.setUniqueID(id);
+            ann.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_BLUE);
+            ann.setLocation(coordinate);
+
+            mapView.addAnnotation(ann, SKAnimationSettings.ANIMATION_NONE);
+        }
+    }
     @Override
     public void onSurfaceCreated(SKMapViewHolder skMapViewHolder) {
 
         mapView = mapHolder.getMapSurfaceView();
         mapView.clearAllOverlays();
-        if(currentPosition != null){
-            mapView.centerMapOnPosition(currentPosition.getCoordinate());
-            start=false;
-        }
+
+
+            if(currentPosition != null){
+                mapView.centerMapOnPosition(currentPosition.getCoordinate());
+                start=false;
+            }
     }
 
     @Override
@@ -449,6 +491,22 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     public void onResume() {
         super.onResume();
         mapHolder.onResume();
+        Address desAddress =((MavigationApplication) getActivity().getApplication()).getDesAddress();
+        if (desAddress != null) {
+            String result = "";
+            for (int i = 0; i < desAddress.getMaxAddressLineIndex(); i++) {
+                result += desAddress.getAddressLine(i);
+                result += " ";
+            }
+            searchButton.setText(result);
+            desCordinate = new SKCoordinate(desAddress.getLongitude(), desAddress.getLatitude());
+            addCircle();
+            if(mapView!= null) {
+                mapView.centerMapOnPosition(desCordinate);
+                mapView.setZoom(17);
+
+            }
+        }
     }
     @Override
     public void onMapRegionChanged(SKCoordinateRegion skCoordinateRegion) {
@@ -468,29 +526,33 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     @Override
     public void onDoubleTap(SKScreenPoint skScreenPoint) {
     }
-
+    private void addCircle(){
+        SKCircle circle = new SKCircle();
+        circle.setCircleCenter(desCordinate);
+        float[] out = new float[4];
+        out[0] = (float) 0.99;
+        out[1] = (float) 0.553;
+        out[2] = (float) 0.016;
+        out[3] = (float) 0.6;
+        circle.setOutlineColor(out);
+        float[] in = new float[4];
+        in[0] = (float) 0.99;
+        in[1] = (float) 0.553;
+        in[2] = (float) 0.016;
+        in[3] = (float) 0.6;
+        circle.setColor(in);
+        circle.setRadius((float) 4.5);
+        circle.setOutlineSize(100);
+        circle.setMaskedObjectScale((float) 2);
+        if (mapView != null) {
+            mapView.addCircle(circle);
+        }
+    }
     @Override
     public void onSingleTap(SKScreenPoint skScreenPoint) {
         if(mapView!=null) {
             desCordinate = mapView.pointToCoordinate(skScreenPoint);
-            SKCircle circle = new SKCircle();
-            circle.setCircleCenter(desCordinate);
-            float[] out = new float[4];
-            out[0] = (float) 0.99;
-            out[1] = (float) 0.553;
-            out[2] = (float) 0.016;
-            out[3] = (float) 0.6;
-            circle.setOutlineColor(out);
-            float[] in = new float[4];
-            in[0] = (float) 0.99;
-            in[1] = (float) 0.553;
-            in[2] = (float) 0.016;
-            in[3] = (float) 0.6;
-            circle.setColor(in);
-            circle.setRadius((float) 4.5);
-            circle.setOutlineSize(100);
-            circle.setMaskedObjectScale((float) 2);
-            mapView.addCircle(circle);
+            addCircle();
         }
     }
 
@@ -531,7 +593,11 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     @Override
     public void onAnnotationSelected(SKAnnotation skAnnotation) {
-
+        annText.setText(annTextMap.get(skAnnotation.getUniqueID()));
+        int annotationHeight = (int) (64 * getResources().getDisplayMetrics().density);;
+        float annotationOffset = skAnnotation.getOffset().getY();
+        mapPopup.setVerticalOffset(-annotationOffset + annotationHeight / 2);
+        mapPopup.showAtLocation(skAnnotation.getLocation(), true);
     }
 
     @Override
@@ -614,6 +680,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         navigationManager.setMapView(mapView);
         navigationManager.setNavigationListener(this);
         navigationManager.startNavigation(navigationSettings);
+        searchButton.setClickable(false);
     }
 
     @Override
@@ -715,5 +782,6 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         SKRouteManager.getInstance().clearCurrentRoute();
         SKNavigationManager.getInstance().stopNavigation();
         navigateButton.setBackgroundResource(R.drawable.navigate);
+        searchButton.setClickable(true);
     }
 }

@@ -5,18 +5,32 @@
     tools:context="com.example.ninasmacpro.mavigation.MapFragment">
 
     <!-- TODO: Update blank fragment layout -->
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <com.skobbler.ngx.map.SKMapViewHolder
         android:id="@+id/map_surface_holder"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
+
+    <Button
+        android:layout_width="436dp"
         android:layout_height="wrap_content"
-        android:id="@+id/navigate_button"
-        android:layout_marginBottom="72dp"
-        android:layout_marginLeft="32dp"
-        android:layout_gravity="left|bottom"
-        android:background="@drawable/navigate"/>
+        android:hint="Destination"
+        android:id="@+id/searchButton"
+        android:gravity="center"
+        android:background="#FFFFFFFF"></Button>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="72dp"
+            android:layout_marginLeft="32dp"
+            android:id="@+id/navigate_button"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/navigate"/>
+    </RelativeLayout>
 </FrameLayout>

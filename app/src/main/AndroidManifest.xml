@@ -59,8 +59,7 @@
 
         <activity
             android:name=".DispatchActivity"
-            android:noHistory="true">
-        </activity>
+            android:noHistory="true"></activity>
         <activity
             android:name=".SplashActivity"
             android:noHistory="true">
@@ -73,14 +72,11 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:parentActivityName=".MainActivity" />
-
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
@@ -91,19 +87,18 @@
         <activity
             android:name=".SettingActivity"
             android:label="@string/title_activity_setting"
-            android:parentActivityName=".TabActivity">
-
-        </activity>
+            android:parentActivityName=".TabActivity"></activity>
         <activity
             android:name=".TabActivity"
             android:label="Mavigation"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".GroupActivity"
             android:label="@string/title_activity_group"
-            android:parentActivityName=".TabActivity">
-        </activity>
+            android:parentActivityName=".TabActivity"></activity>
+        <activity android:name=".AdressSearch"
+            android:label="@string/title_activity_address_search"
+            android:parentActivityName=".TabActivity"/>
 
         <activity
             android:name=".SearchFriendActivity"
@@ -138,6 +133,7 @@
                 <category android:name="com.example.ninasmacpro.mavigation" />
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>

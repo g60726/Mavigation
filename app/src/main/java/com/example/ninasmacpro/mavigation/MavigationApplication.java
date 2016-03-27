@@ -3,6 +3,7 @@ package com.example.ninasmacpro.mavigation;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Address;
 
 import com.parse.Parse;
 import com.parse.ParseInstallation;
@@ -33,6 +34,16 @@ public class MavigationApplication extends Application {
      * object for the naviagation mode selection
      */
     private SKNavigationSettings.SKNavigationType navigationType= SKNavigationSettings.SKNavigationType.SIMULATION;
+
+    private Address desAddress = null;
+
+    public void setDesAddress(Address desAddress) {
+        this.desAddress = desAddress;
+    }
+
+    public Address getDesAddress() {
+        return desAddress;
+    }
 
     public SKNavigationSettings.SKNavigationType getNavigationType() {
         return navigationType;

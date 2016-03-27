@@ -29,4 +29,5 @@
     <string name="prompt_sign_up_nick_name">Nick Name</string>
     <string name="action_sign_up">Sign Up</string>
     <string name="title_activity_setting">Setting</string>
+    <string name="title_activity_address_search">Search Address</string>
 </resources>
