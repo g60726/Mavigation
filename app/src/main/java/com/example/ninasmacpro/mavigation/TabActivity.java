@@ -139,7 +139,9 @@ public class TabActivity extends AppCompatActivity {
 
     }
 
-
+    public MapFragment getMapFragment() {
+        return mMapFragment;
+    }
 
     // stupid android 6.0!!!!!!
     private void requestPermissions() {
