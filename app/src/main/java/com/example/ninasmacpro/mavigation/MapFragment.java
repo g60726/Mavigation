@@ -192,6 +192,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 Log.w("groupmember_hashset", mGroupMemberObjectId.toString());
                 mGroupOnParse = new ParseObject("Group");
                 updateGroup(groupMemberObjectId); // to ensure uniqueness of each member
+                //showGroupMemberOnMap();
             } else {
                 // not used now
             }
@@ -226,6 +227,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                     mGroupOnParse = object;
                     // update Group object
                     updateGroup(newGroupMemberObjectId);
+                    //showGroupMemberOnMap();
                 } else {
                     // something went wrong
                 }
@@ -233,6 +235,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         });
 
     }
+
 
     private void updateGroup(ArrayList<String> newGroupMember) {
         mGroupOnParse.put("groupName", mGroupName);
@@ -253,6 +256,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                             mGroupObjectId = mGroupOnParse.getObjectId();
                             mParseUser.put("groupObjectId", mGroupObjectId);
                             mParseUser.saveInBackground();
+                            showGroupMembersLocation();
                         }
                     });
                 } else {
@@ -260,6 +264,34 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 }
             }
         });
+    }
+
+    private void showGroupMembersLocation() {
+        // update group member's location on map
+        ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
+        try {
+            List<ParseUser> groupMember = temp.getQuery().find();
+            int count = 1;
+            for (ParseUser temp2: groupMember) {
+                if (temp2.getObjectId() != mParseUser.getObjectId()) {
+                    ParseObject userInfo = temp2.getParseObject("userInfo");
+                    String userNickName =  (String) temp2.get("nickName");
+                    if (userInfo != null) {
+                        try {
+                            Double longitude = userInfo.fetchIfNeeded().getDouble("longitude");
+                            Double latitude = userInfo.fetchIfNeeded().getDouble("latitude");
+                            addAnnotation(userNickName, new SKCoordinate(longitude, latitude), count);
+                        } catch (ParseException e2) {
+                            e2.printStackTrace();
+                        }
+
+                    }
+                    count++;
+                }
+            }
+        } catch (ParseException e2) {
+
+        }
     }
 
     @Override
@@ -280,13 +312,14 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                     if (e == null) {
                         if (object != null) {
                             mGroupOnParse = object;
+                            showGroupMembersLocation(); // since mapView may not have been initialized yet, this may not do anything at all
                             hasGroup = true;
                             mGroupName = mGroupOnParse.getString("groupName");
                             mGroupMemberObjectId = new ArrayList<String>();
                             ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
                             try {
                                 List<ParseUser> groupMember = temp.getQuery().find();
-                                for (ParseUser temp2 : groupMember) {
+                                for (ParseUser temp2: groupMember) {
                                     Log.w("getGroupObject", temp2.getObjectId());
                                     mGroupMemberObjectId.add(temp2.getObjectId());
                                 }
@@ -411,6 +444,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         // update Group on Parse
         ParseRelation<ParseUser> updateGroup = mGroupOnParse.getRelation("members");
 
+        // remove all group member's location
+        mapView.deleteAllAnnotationsAndCustomPOIs();
+        mapPopup.hide();
+        
         try {
             List<ParseUser> groupMember = updateGroup.getQuery().find();
             Log.w("group member list", groupMember.toString());
@@ -454,8 +491,9 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     public void onActionZoom() {
 
     }
+
     //add annotation
-    private void addAnnotation(String text,SKCoordinate coordinate,int id){
+    private void addAnnotation(String text, SKCoordinate coordinate, int id) {
         if(mapView!=null){
             annTextMap.put(id, text);
 
@@ -468,17 +506,25 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             mapView.addAnnotation(ann, SKAnimationSettings.ANIMATION_NONE);
         }
     }
+
+    private void removeAnnotation(int id) {
+        mapView.deleteAnnotation(id);
+    }
+
     @Override
     public void onSurfaceCreated(SKMapViewHolder skMapViewHolder) {
 
         mapView = mapHolder.getMapSurfaceView();
         mapView.clearAllOverlays();
 
+        if (currentPosition != null) {
+            mapView.centerMapOnPosition(currentPosition.getCoordinate());
+            start=false;
+        }
 
-            if(currentPosition != null){
-                mapView.centerMapOnPosition(currentPosition.getCoordinate());
-                start=false;
-            }
+        if (mGroupOnParse != null) {
+            showGroupMembersLocation();
+        }
     }
 
     @Override

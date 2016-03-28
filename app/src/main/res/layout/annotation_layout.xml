@@ -8,5 +8,6 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/textAnnotation"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:textColor="#ec0b0b" />
 </LinearLayout>
