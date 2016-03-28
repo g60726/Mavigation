@@ -19,10 +19,14 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class TabActivity extends AppCompatActivity {
 
@@ -62,6 +66,37 @@ public class TabActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //check activity
+//        try {
+//            Log.i("debug1", "check activity");
+//            Intent intent = getIntent();
+//            Bundle extras = intent.getExtras();
+//            if (extras != null) {
+//                Log.i("debug2", "extras is not null");
+//                String jsonData = extras.getString("com.parse.Data");
+//                JSONObject json;
+//                json = new JSONObject(jsonData);
+//                String pushStore = json.getString("alert");
+////                data.setText(pushStore);
+//                if(pushStore!=null) {
+//                    Log.i("debug3", "start new activity");
+//
+//                    Intent pushIntent = new Intent(TabActivity.this, SearchFriendActivity.class);
+////                    pushIntent.setClassName(TabActivity.this, "package.name.List");
+//                    pushIntent.putExtra("store", pushStore);
+//                    startActivity(pushIntent);
+//                }
+//            }
+//
+//        } catch (JSONException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+
+
+
+
         setContentView(R.layout.activity_tab);
 
         requestPermissions();

@@ -131,7 +131,7 @@ public class FriendListViewAdapter extends BaseAdapter {
                 user.saveInBackground(new SaveCallback() {
                     public void done(ParseException e) {
                         showCallBackInfo(view);
-                        sendFriendRequest(objectId, user.getUsername());
+                        sendFriendRequest(objectId, user.getUsername(), user.getEmail());
                     }
                 });
             }
@@ -142,16 +142,17 @@ public class FriendListViewAdapter extends BaseAdapter {
         dialog.show();
 
     }
-    private void sendFriendRequest(String contactObjectId, String nickname){
+    private void sendFriendRequest(String contactObjectId, String username, String contactEmail){
         ParseQuery pushQuery = ParseInstallation.getQuery();
         pushQuery.whereEqualTo("user", contactObjectId);
-        String message = nickname + " want to add you";
+        String message = username + " want to add you";
         try{
 //            JSONObject data = new JSONObject("{\"alert\": \"xxxx want to add you!!!\"}");
             JSONObject data = new JSONObject();
             data.put("alert", message);
 //            JSONObject data = new JSONObject("{\"alert\": \"xxxx want to add you!\",\"uri\": \"myapp://host/path\"}");
-
+            data.put("action", "friend");
+            data.put("contactEmail", contactEmail);
             ParsePush push = new ParsePush();
             push.setQuery(pushQuery); // Set our Installation query
 //            push.setMessage("xxxx want to add you");

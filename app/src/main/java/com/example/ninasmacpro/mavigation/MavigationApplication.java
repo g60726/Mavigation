@@ -62,6 +62,7 @@ public class MavigationApplication extends Application {
         appPrefs = new ApplicationPreferences(this);
         Parse.enableLocalDatastore(this);
         Parse.initialize(this);
+
         ParseInstallation.getCurrentInstallation().saveInBackground();
     }
     public void setMapResourcesDirPath(String mapResourcesDirPath) {

@@ -27,6 +27,9 @@ import com.skobbler.ngx.util.SKLogging;
 import com.skobbler.ngx.versioning.SKMapUpdateListener;
 import com.skobbler.ngx.versioning.SKVersioningManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 /**
  * Activity that installs required resources (from assets/MapResources.zip) to
@@ -49,6 +52,33 @@ public class SplashActivity extends Activity implements SKPrepareMapTextureListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //check activity
+//        try {
+//            Log.i("debug1", "check activity");
+//            Intent intent = getIntent();
+//            Bundle extras = intent.getExtras();
+//            if (extras != null) {
+//                Log.i("debug2", "extras is not null");
+//                String jsonData = extras.getString("com.parse.Data");
+//                JSONObject json;
+//                json = new JSONObject(jsonData);
+//                String pushStore = json.getString("alert");
+//                if(pushStore!=null) {
+//                    Log.i("debug3", "start new activity");
+//
+//                    Intent pushIntent = new Intent(SplashActivity.this, SearchFriendActivity.class);
+//                    pushIntent.putExtra("store", pushStore);
+//                    startActivity(pushIntent);
+//                }
+//            }
+//
+//        } catch (JSONException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+
+
+
         setContentView(R.layout.activity_splash);
 
         SKLogging.enableLogs(true);
