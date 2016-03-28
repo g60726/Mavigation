@@ -2,7 +2,6 @@ package com.example.ninasmacpro.mavigation;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 
 

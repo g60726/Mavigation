@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.parse.ParseUser;
-import com.skobbler.ngx.map.SKMapSettings;
 import com.skobbler.ngx.navigation.SKNavigationSettings;
 
 public class SettingActivity extends AppCompatActivity {

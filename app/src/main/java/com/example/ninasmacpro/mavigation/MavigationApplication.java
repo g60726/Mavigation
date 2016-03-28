@@ -1,13 +1,10 @@
 package com.example.ninasmacpro.mavigation;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.location.Address;
 
 import com.parse.Parse;
 import com.parse.ParseInstallation;
-import com.parse.ParseObject;
 import com.skobbler.ngx.navigation.SKNavigationSettings;
 
 /**

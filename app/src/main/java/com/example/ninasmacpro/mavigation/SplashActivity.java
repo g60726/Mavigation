@@ -21,15 +21,9 @@ import android.widget.Toast;
 import com.skobbler.ngx.SKPrepareMapTextureListener;
 import com.skobbler.ngx.SKPrepareMapTextureThread;
 import com.skobbler.ngx.map.SKMapSurfaceView;
-import com.skobbler.ngx.navigation.SKAdvisorSettings;
-import com.skobbler.ngx.routing.SKRouteManager;
 import com.skobbler.ngx.util.SKLogging;
 import com.skobbler.ngx.versioning.SKMapUpdateListener;
 import com.skobbler.ngx.versioning.SKVersioningManager;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 
 /**
  * Activity that installs required resources (from assets/MapResources.zip) to

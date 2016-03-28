@@ -1,6 +1,5 @@
 package com.example.ninasmacpro.mavigation;
 
-import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v7.app.AppCompatActivity;
@@ -10,15 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-import com.skobbler.ngx.packages.SKPackageManager;
-import com.skobbler.ngx.packages.SKPackageURLInfo;
-import com.skobbler.ngx.search.SKMultiStepSearchSettings;
-import com.skobbler.ngx.search.SKSearchListener;
-import com.skobbler.ngx.search.SKSearchManager;
-import com.skobbler.ngx.search.SKSearchResult;
-
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 public class AdressSearch extends AppCompatActivity {

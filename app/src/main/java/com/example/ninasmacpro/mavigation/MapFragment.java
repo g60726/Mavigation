@@ -248,7 +248,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             public void done(List<ParseUser> users, ParseException e) {
                 if (e == null) {
                     // The query was successful.
-                    for (ParseUser user : users) {
+                    for (ParseUser user: users) {
                         relation.add(user);
                     }
                     mGroupOnParse.saveInBackground(new SaveCallback() {

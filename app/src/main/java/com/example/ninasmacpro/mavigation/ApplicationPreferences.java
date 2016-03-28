@@ -1,10 +1,7 @@
 package com.example.ninasmacpro.mavigation;
 
-import java.util.List;
 import android.content.Context;
 import android.content.SharedPreferences;
-//import com.google.gson.Gson;
-//import com.skobbler.sdkdemo.database.DownloadResource;
 
 /**
  * Created by Tudor on 12/5/2014.

@@ -2,7 +2,6 @@ package com.example.ninasmacpro.mavigation;
 
 import android.content.Context;
 import android.location.Address;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

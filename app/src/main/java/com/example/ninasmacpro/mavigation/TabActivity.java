@@ -19,14 +19,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class TabActivity extends AppCompatActivity {
 
