@@ -62,6 +62,19 @@ public class TabActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        //
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            Log.i("debug ", "intent comes from notification:");
+            String groupObjectId = extras.getString("groupObjectId");
+//            mMapFragment.hasGroup = true;
+            mMapFragment.mGroupObjectId = groupObjectId;
+            //call new update group function to find group members,
+
+
+        }
+
         //check activity
 //        try {
 //            Log.i("debug1", "check activity");

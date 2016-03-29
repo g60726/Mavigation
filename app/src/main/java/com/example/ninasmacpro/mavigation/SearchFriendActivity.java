@@ -39,7 +39,6 @@ public class SearchFriendActivity extends AppCompatActivity {
         //
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-//            sv.setVisibility(false);
             sv.setVisibility(View.GONE);
             Log.i("debug ", "intent comes from notification:");
             String contactEmail = extras.getString("contactEmail");

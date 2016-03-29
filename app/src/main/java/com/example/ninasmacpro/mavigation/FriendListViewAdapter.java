@@ -31,6 +31,8 @@ public class FriendListViewAdapter extends BaseAdapter {
     Context context;
     LayoutInflater inflater;
 
+//    boolean flag = false;
+
     private List<Population> friendPopulation = null;
     private ArrayList<Population> arraylist;
 
@@ -70,6 +72,7 @@ public class FriendListViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
+
         if(convertView == null){
             holder = new ViewHolder();
             convertView = inflater.inflate(R.layout.friendlistview_item, null);
@@ -93,12 +96,36 @@ public class FriendListViewAdapter extends BaseAdapter {
 
             @Override
             public void onClick(View v) {
-                showFriendConfirmDialog(v, nickname, objectId);
+
+                checkFriendStatus(objectId, v, nickname);
+//                showFriendConfirmDialog(v, nickname, objectId);
                 Log.i(TAG, "onClick: loading... ");
+            }
+            public void checkFriendStatus(final String objectId, final View v, final String nickname){
+                ParseUser user = ParseUser.getCurrentUser();
+                ParseRelation<ParseUser> relation = user.getRelation("friends");
+                ParseQuery<ParseUser> query = relation.getQuery();
+                query.whereEqualTo("objectId", objectId);
+
+                query.findInBackground(new FindCallback<ParseUser>(){
+                    @Override
+                    public void done(List<ParseUser> user, ParseException e){
+                        if(user.size() == 0 && e == null){
+                            //TODO remove post from relation
+                            showFriendConfirmDialog(v, nickname, objectId);
+                        } if (user.size() != 0 && e == null){
+                            //TODO add post to relation
+
+                        }else{
+
+                        }
+                    }
+                });
             }
         });
         return convertView;
     }
+
 
     private AlertDialog.Builder builder;
     private void showFriendConfirmDialog(final View view, final String nickname, final String objectId){
@@ -125,6 +152,7 @@ public class FriendListViewAdapter extends BaseAdapter {
                 user.saveInBackground(new SaveCallback() {
                     public void done(ParseException e) {
                         showCallBackInfo(view);
+
                         sendFriendRequest(objectId, user.getUsername(), user.getEmail());
                     }
                 });
@@ -136,22 +164,20 @@ public class FriendListViewAdapter extends BaseAdapter {
         dialog.show();
 
     }
+
+
     private void sendFriendRequest(String contactObjectId, String username, String contactEmail){
         ParseQuery pushQuery = ParseInstallation.getQuery();
         pushQuery.whereEqualTo("user", contactObjectId);
         String message = username + " want to add you";
         try{
-//            JSONObject data = new JSONObject("{\"alert\": \"xxxx want to add you!!!\"}");
             JSONObject data = new JSONObject();
             data.put("alert", message);
-//            JSONObject data = new JSONObject("{\"alert\": \"xxxx want to add you!\",\"uri\": \"myapp://host/path\"}");
             data.put("action", "friend");
             data.put("contactEmail", contactEmail);
             ParsePush push = new ParsePush();
             push.setQuery(pushQuery); // Set our Installation query
-//            push.setMessage("xxxx want to add you");
             push.setData(data);
-//            push.sendPushInBackground();
             push.sendInBackground();
         }catch (Exception e){
             Log.i("debug3", "jason data type went wrong");

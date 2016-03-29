@@ -21,7 +21,9 @@ import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -53,6 +55,8 @@ import com.skobbler.ngx.routing.SKRouteJsonAnswer;
 import com.skobbler.ngx.routing.SKRouteListener;
 import com.skobbler.ngx.routing.SKRouteManager;
 import com.skobbler.ngx.routing.SKRouteSettings;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,10 +90,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     private ParseUser mParseUser = null;
     private ParseObject mUserInfo = null; // user's associated UserInfo object
 
-    private boolean hasGroup = false;
+    public boolean hasGroup = false;
     private ParseObject mGroupOnParse = null;
-    private String mGroupName = null;
-    private String mGroupObjectId = null;
+    public String mGroupName = null;
+    public String mGroupObjectId = null;
     private ArrayList<String> mGroupMemberObjectId = null;
 
     private TabActivity mTabActivity = null;
@@ -269,7 +273,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     }
 
 
-    private void updateGroup(ArrayList<String> newGroupMember) {
+    private void updateGroup(final ArrayList<String> newGroupMember) {
         mGroupOnParse.put("groupName", mGroupName);
         final ParseRelation<ParseUser> relation = mGroupOnParse.getRelation("members");
         String [] temp = newGroupMember.toArray(new String[newGroupMember.size()]);
@@ -286,6 +290,8 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                     mGroupOnParse.saveInBackground(new SaveCallback() {
                         public void done(ParseException e) {
                             mGroupObjectId = mGroupOnParse.getObjectId();
+                            //send request
+                            sendGroupRequest(mGroupObjectId, newGroupMember);
                             mParseUser.put("groupObjectId", mGroupObjectId);
                             mParseUser.saveInBackground();
                             showGroupMembersLocation();
@@ -305,6 +311,31 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 }
             }
         });
+    }
+    //send notification to all group members
+    private void sendGroupRequest(String groupObjectId, ArrayList<String> newGroupMember){
+        ParseQuery pushQuery = ParseInstallation.getQuery();
+
+        for (String contactObjectId: newGroupMember){
+            pushQuery.whereEqualTo("user", contactObjectId);
+            String message = groupObjectId + " invites  you";
+            try{
+                JSONObject data = new JSONObject();
+                data.put("alert", message);
+                data.put("action", "group");
+                data.put("groupObjectId", groupObjectId);
+                ParsePush push = new ParsePush();
+                push.setQuery(pushQuery); // Set our Installation query
+                push.setData(data);
+                push.sendInBackground();
+            }catch (Exception e){
+                Log.i("debug3", "jason data type went wrong");
+            }
+        }
+    }
+
+    public void notificationUpdateGroup(String groupObjectId){
+        
     }
 
     private void showGroupMembersLocation() {
