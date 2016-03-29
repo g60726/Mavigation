@@ -315,22 +315,25 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     //send notification to all group members
     private void sendGroupRequest(String groupObjectId, ArrayList<String> newGroupMember){
         ParseQuery pushQuery = ParseInstallation.getQuery();
-
+        String currentUserId = ParseUser.getCurrentUser().getObjectId();
         for (String contactObjectId: newGroupMember){
-            pushQuery.whereEqualTo("user", contactObjectId);
-            String message = groupObjectId + " invites  you";
-            try{
-                JSONObject data = new JSONObject();
-                data.put("alert", message);
-                data.put("action", "group");
-                data.put("groupObjectId", groupObjectId);
-                ParsePush push = new ParsePush();
-                push.setQuery(pushQuery); // Set our Installation query
-                push.setData(data);
-                push.sendInBackground();
-            }catch (Exception e){
-                Log.i("debug3", "jason data type went wrong");
+            if (!contactObjectId.equals(currentUserId) ){
+                pushQuery.whereEqualTo("user", contactObjectId);
+                String message = groupObjectId + " invites  you";
+                try{
+                    JSONObject data = new JSONObject();
+                    data.put("alert", message);
+                    data.put("action", "group");
+                    data.put("groupObjectId", groupObjectId);
+                    ParsePush push = new ParsePush();
+                    push.setQuery(pushQuery); // Set our Installation query
+                    push.setData(data);
+                    push.sendInBackground();
+                }catch (Exception e){
+                    Log.i("debug3", "jason data type went wrong");
+                }
             }
+
         }
     }
 

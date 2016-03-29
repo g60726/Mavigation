@@ -19,12 +19,14 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 public class TabActivity extends AppCompatActivity {
-
+    private boolean needToGetNotification = false;
+    private String mGroupObjectId = null;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -68,10 +70,14 @@ public class TabActivity extends AppCompatActivity {
         if (extras != null) {
             Log.i("debug ", "intent comes from notification:");
             String groupObjectId = extras.getString("groupObjectId");
+            mGroupObjectId = groupObjectId;
+            if(mMapFragment != null) {
+                mMapFragment.notificationUpdateGroup(groupObjectId);
+            } else {
+                needToGetNotification = true;
+            }
 //            mMapFragment.hasGroup = true;
-            mMapFragment.mGroupObjectId = groupObjectId;
             //call new update group function to find group members,
-
 
         }
 
@@ -330,6 +336,9 @@ public class TabActivity extends AppCompatActivity {
                 case 0:
                     // Top Rated fragment activity
                     mMapFragment = MapFragment.newInstance("p1", "p2");
+                    if (needToGetNotification) {
+                        mMapFragment.notificationUpdateGroup(mGroupObjectId);
+                    }
                     return mMapFragment;
                 case 1:
                     // Games fragment activity
