@@ -285,7 +285,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             public void done(List<ParseUser> users, ParseException e) {
                 if (e == null) {
                     // The query was successful.
-                    for (ParseUser user: users) {
+                    for (ParseUser user : users) {
                         relation.add(user);
                     }
                     mGroupOnParse.saveInBackground(new SaveCallback() {
@@ -339,15 +339,29 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         }
     }
 
+    public String getGroupObjectId() {
+        return mGroupObjectId;
+    }
+
     // Receiver of push notification from Parse.
     public void notificationUpdateGroup(String groupObjectId) {
         hasGroup = true;
         mGroupObjectId = groupObjectId;
 
+        if (mParseUser == null) {
+            mParseUser = ParseUser.getCurrentUser();
+        }
+
         mParseUser.put("groupObjectId", mGroupObjectId);
         mParseUser.saveInBackground();
 
+        mTabActivity = (TabActivity) this.getActivity();
+        /*
+        if (mTabActivity.getMessageFragment() == null) {
+            Log.w("asdklawjlksdf", "message fragment is null");
+        }
         mTabActivity.getMessageFragment().startRetrievingGroupMessages(mGroupObjectId); //TODO: is this working?
+        */
 
         updateEverythingAboutGroup();
 
@@ -356,6 +370,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             mTimer.cancel();
             mTimer = null;
         }
+
         mTimer = new Timer();
         mTimerTask = new MyTimerTask(mTabActivity.getMapFragment());
         mTimer.schedule(mTimerTask, 1000, 3000); //delay 1000ms, repeat in 3000ms
@@ -396,6 +411,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         }
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -405,6 +421,12 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         // get current Parse user and its pointer to user info
         mParseUser = ParseUser.getCurrentUser();
         mUserInfo = mParseUser.getParseObject("userInfo");
+
+        /*
+        if (mGroupObjectId != null) {
+            mParseUser.put("groupObjectId", mGroupObjectId);
+            mParseUser.saveInBackground();
+        }*/
 
         // check if user is in a group
         mGroupObjectId = (String) mParseUser.get("groupObjectId");
@@ -418,6 +440,11 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                             mGroupOnParse = object;
                             showGroupMembersLocation(); // since mapView may not have been initialized yet, this may not do anything at all
                             hasGroup = true;
+
+                            mTimer = new Timer();
+                            mTimerTask = new MyTimerTask(mTabActivity.getMapFragment());
+                            mTimer.schedule(mTimerTask, 1000, 3000); //delay 1000ms, repeat in 3000ms
+
                             mGroupName = mGroupOnParse.getString("groupName");
                             mGroupMemberObjectId = new ArrayList<String>();
                             ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
@@ -453,7 +480,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         //start map holder map view and start map view listener
         mapHolder = (SKMapViewHolder) rootView.findViewById(R.id.map_surface_holder);
         mapHolder.setMapSurfaceListener(this);
-       //map popup text view
+        //map popup text view
         popUpView = inflater.inflate(R.layout.annotation_layout, null);
         annText = (TextView)popUpView.findViewById(R.id.textAnnotation);
         mapPopup = mapHolder.getCalloutView();
@@ -537,11 +564,16 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
     public void leaveCurrentGroup() {
         // stop updating group info
-        mTimer.cancel();
-        mTimer = null;
+        if (mTimer!= null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+
 
         // stop getting group messages from Parse
-        mTabActivity.getMessageFragment().stopRetrievingGroupMessages();
+        if (mTabActivity.getMessageFragment() != null) {
+            mTabActivity.getMessageFragment().stopRetrievingGroupMessages();
+        }
 
         hasGroup = false;
         mGroupName = null;
@@ -650,6 +682,13 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     @Override
     public void onResume() {
         super.onResume();
+
+        mTabActivity = (TabActivity) this.getActivity();
+
+        // get current Parse user and its pointer to user info
+        mParseUser = ParseUser.getCurrentUser();
+        mUserInfo = mParseUser.getParseObject("userInfo");
+
         mapHolder.onResume();
         Address desAddress =((MavigationApplication) getActivity().getApplication()).getDesAddress();
         if (desAddress != null) {

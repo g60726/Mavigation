@@ -134,6 +134,10 @@ public class MessageFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mTabActivity = (TabActivity) this.getActivity();
+        mGroupObjectId = mTabActivity.getMapFragment().getGroupObjectId();
+        if (mGroupObjectId != null) {
+            startRetrievingGroupMessages(mGroupObjectId);
+        }
 
     }
 

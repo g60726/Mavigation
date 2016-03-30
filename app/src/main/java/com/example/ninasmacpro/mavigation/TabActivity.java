@@ -49,9 +49,9 @@ public class TabActivity extends AppCompatActivity {
     private static final int REQUEST_ACCESS_NETWORK_STATE = 5;
     private static final int REQUEST_ACCESS_WIFI_STATE = 6;
 
-    private MapFragment mMapFragment = null;
-    private MessageFragment mMessageFragment = null;
-    private FriendFragment mFriendFragment = null;
+    private MapFragment mMapFragment = MapFragment.newInstance("p1", "p2");
+    private MessageFragment mMessageFragment = MessageFragment.newInstance("p1", "p2");
+    private FriendFragment mFriendFragment = FriendFragment.newInstance("p1", "p2");
 
     private View mLayout;
 
@@ -64,8 +64,6 @@ public class TabActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        //
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             Log.i("debug ", "intent comes from notification:");
@@ -339,18 +337,16 @@ public class TabActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     // Top Rated fragment activity
-                    mMapFragment = MapFragment.newInstance("p1", "p2");
+
                     if (needToGetNotification) {
                         mMapFragment.notificationUpdateGroup(mGroupObjectId);
                     }
                     return mMapFragment;
                 case 1:
                     // Games fragment activity
-                    mFriendFragment = FriendFragment.newInstance("p1", "p2");
                     return mFriendFragment;
                 case 2:
                     // Movies fragment activity
-                    mMessageFragment = MessageFragment.newInstance("p1", "p2");
                     return mMessageFragment;
             }
 
