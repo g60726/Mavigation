@@ -90,10 +90,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     private ParseUser mParseUser = null;
     private ParseObject mUserInfo = null; // user's associated UserInfo object
 
-    public boolean hasGroup = false;
+    private boolean hasGroup = false;
     private ParseObject mGroupOnParse = null;
-    public String mGroupName = null;
-    public String mGroupObjectId = null;
+    private String mGroupName = null;
+    private String mGroupObjectId = null;
     private ArrayList<String> mGroupMemberObjectId = null;
 
     private TabActivity mTabActivity = null;
