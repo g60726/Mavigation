@@ -56,5 +56,15 @@
             android:layout_height="wrap_content"
             android:text="Real"
             android:id="@+id/button_real" />
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hide Me"
+            android:id="@+id/hideEmailSwitch"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
     </LinearLayout>
+
+
 </RelativeLayout>

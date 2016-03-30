@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.parse.ParseUser;
@@ -17,7 +19,7 @@ public class SettingActivity extends AppCompatActivity {
 
     private Button simButton;
     private Button realButton;
-
+    private Switch hideEmailSwitch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -25,6 +27,8 @@ public class SettingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
         logOutButton = (Button) findViewById(R.id.logOutButton);
         nickNameTextView = (TextView) findViewById(R.id.nickNameTextView);
+        hideEmailSwitch = (Switch) findViewById(R.id.hideEmailSwitch);
+
 
         simButton = (Button) findViewById(R.id.button_sim);
         realButton = (Button) findViewById(R.id.button_real);
@@ -56,8 +60,31 @@ public class SettingActivity extends AppCompatActivity {
                 setNavigationType(SKNavigationSettings.SKNavigationType.REAL);
             }
         });
+
+
+        //set switch on/off
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        Boolean switchStatus = currentUser.getBoolean("hideEmail");
+        hideEmailSwitch.setChecked(switchStatus);
+        hideEmailSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+
+                if (isChecked) {
+                    currentUser.put("hideEmail", true);
+                } else {
+                    currentUser.put("hideEmail", false);
+                }
+                currentUser.saveInBackground();
+
+            }
+        });
     }
     private void setNavigationType(SKNavigationSettings.SKNavigationType type){
         ((MavigationApplication)getApplication()).setNavigationType(type);
     }
+
+
 }

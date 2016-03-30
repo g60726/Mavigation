@@ -137,6 +137,7 @@ public class SignUpActivity extends AppCompatActivity {
             user.setUsername(email); //user name is the same as email, and is unique
             user.setPassword(password);
             user.put("nickName", nickName);
+            user.put("hideEmail", false);
             //create user info object
 
 

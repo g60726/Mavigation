@@ -117,7 +117,8 @@ public class SearchFriendActivity extends AppCompatActivity {
     public boolean queryFriend(String query) {
         Log.i(TAG, "onQueryTextSubmit: success " + " query: " + query);
         ParseQuery<ParseUser> queryFriend = ParseUser.getQuery();
-        queryFriend.whereStartsWith("email", query);
+        queryFriend.whereStartsWith("username", query);
+        queryFriend.whereEqualTo("hideEmail", false);
         queryFriend.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> friendsList, ParseException e) {
                 if (e == null) {
