@@ -20,6 +20,7 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 
 /**
@@ -45,13 +46,17 @@ public class MessageFragment extends Fragment {
     private Button mSendMessageButton;
     private EditText mMessageTextView;
 
+    private TabActivity mTabActivity = null;
+    Timer mTimer;
+    MessageTask mMessageTask;
+
     public MessageFragment() {
         // Required empty public constructor
     }
 
     // when we first enter this fragment, get all previous messages from Parse (for this current group)
-    // TODO: for later message, use push notification
-    private void getPreviousMessagesFromParse() {
+    // TODO: for later message, use push notification?
+    public void getMessagesFromParse() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
         query.whereEqualTo("objectId", mGroupObjectId);
         query.orderByAscending("createdAt");
@@ -126,6 +131,8 @@ public class MessageFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mTabActivity = (TabActivity) this.getActivity();
+
     }
 
     @Override
@@ -139,7 +146,7 @@ public class MessageFragment extends Fragment {
         mParseUser = ParseUser.getCurrentUser();
         mGroupObjectId = (String) mParseUser.get("groupObjectId");
         if (mGroupObjectId != null && mGroupObjectId != "") {
-            getPreviousMessagesFromParse();
+            getMessagesFromParse();
             checkSendButtonClick(rootView); // send button only work if the user is in a group
         } else { // FIXME: delete this part in real usage
             Log.w("dummy one", "success");
@@ -170,6 +177,27 @@ public class MessageFragment extends Fragment {
 
             }
         });
+    }
+
+    public void startRetrievingGroupMessages(String groupObjectId) {
+        mGroupObjectId = groupObjectId;
+
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+        mTimer = new Timer();
+        mMessageTask = new MessageTask(mTabActivity.getMessageFragment());
+        mTimer.schedule(mMessageTask, 1000, 3000); //delay 1000ms, repeat in 3000ms
+
+    }
+
+    public void stopRetrievingGroupMessages() {
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+        mGroupObjectId = null;
     }
 
 }

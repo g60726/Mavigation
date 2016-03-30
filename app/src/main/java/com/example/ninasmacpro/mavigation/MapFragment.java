@@ -343,8 +343,11 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     public void notificationUpdateGroup(String groupObjectId) {
         hasGroup = true;
         mGroupObjectId = groupObjectId;
+
         mParseUser.put("groupObjectId", mGroupObjectId);
         mParseUser.saveInBackground();
+
+        mTabActivity.getMessageFragment().startRetrievingGroupMessages(mGroupObjectId); //TODO: is this working?
 
         updateEverythingAboutGroup();
 
@@ -536,6 +539,9 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         // stop updating group info
         mTimer.cancel();
         mTimer = null;
+
+        // stop getting group messages from Parse
+        mTabActivity.getMessageFragment().stopRetrievingGroupMessages();
 
         hasGroup = false;
         mGroupName = null;

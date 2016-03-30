@@ -162,6 +162,10 @@ public class TabActivity extends AppCompatActivity {
         return mMapFragment;
     }
 
+    public MessageFragment getMessageFragment() {
+        return mMessageFragment;
+    }
+
     // stupid android 6.0!!!!!!
     private void requestPermissions() {
         // Here, thisActivity is the current activity
