@@ -91,7 +91,11 @@
         <activity
             android:name=".TabActivity"
             android:label="Mavigation"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="updateGroup"></action>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".GroupActivity"
             android:label="@string/title_activity_group"

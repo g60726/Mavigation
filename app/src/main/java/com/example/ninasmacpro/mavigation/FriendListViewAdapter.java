@@ -176,6 +176,7 @@ public class FriendListViewAdapter extends BaseAdapter {
             data.put("alert", message);
             data.put("action", "friend");
             data.put("contactEmail", contactEmail);
+            data.put("username", username);
             ParsePush push = new ParsePush();
             push.setQuery(pushQuery); // Set our Installation query
             push.setData(data);

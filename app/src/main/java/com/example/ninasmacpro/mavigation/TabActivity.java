@@ -2,8 +2,10 @@ package com.example.ninasmacpro.mavigation;
 
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -60,24 +62,50 @@ public class TabActivity extends AppCompatActivity {
         mMapFragment.onButtonGroup();
     }
 
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //... update ui here
+            Log.i("debug ", "intent comes from group update notification:");
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                String groupObjectId = extras.getString("groupObjectId");
+                Log.i(" groupObjectId is: ", groupObjectId);
+
+            }
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("updateGroup");
+        registerReceiver(receiver, filter);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(receiver);
+        super.onPause();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            Log.i("debug ", "intent comes from notification:");
-            String groupObjectId = extras.getString("groupObjectId");
-            mGroupObjectId = groupObjectId;
-            if(mMapFragment != null) {
-                mMapFragment.notificationUpdateGroup(groupObjectId);
-            } else {
-                needToGetNotification = true;
-            }
-//            mMapFragment.hasGroup = true;
-            //call new update group function to find group members,
+//        Bundle extras = getIntent().getExtras();
+//        if (extras != null) {
+//            Log.i("debug ", "intent comes from notification:");
+//            String groupObjectId = extras.getString("groupObjectId");
+//            mGroupObjectId = groupObjectId;
+//            if(mMapFragment != null) {
+//                mMapFragment.notificationUpdateGroup(groupObjectId);
+//            } else {
+//                needToGetNotification = true;
+//            }
+//
+//        }
 
-        }
 
         //check activity
 //        try {

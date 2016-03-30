@@ -42,7 +42,9 @@ public class SearchFriendActivity extends AppCompatActivity {
             sv.setVisibility(View.GONE);
             Log.i("debug ", "intent comes from notification:");
             String contactEmail = extras.getString("contactEmail");
-            queryFriend(contactEmail);
+            String username = extras.getString("username");
+
+            queryFriend(username);
         }
 
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
