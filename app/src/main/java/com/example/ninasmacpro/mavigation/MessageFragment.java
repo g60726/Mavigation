@@ -64,6 +64,8 @@ public class MessageFragment extends Fragment {
             public void done(List<ParseObject> messageList, ParseException e) {
                 if (e == null) {
                     Log.w("get from Parse", "success");
+                    mMessageContent.clear();
+                    mMessageSender.clear();
                     for (ParseObject message: messageList) {
                         mMessageContent.add((String) message.get("content"));
                         mMessageSender.add((String) message.get("sender"));
