@@ -6,6 +6,7 @@ import android.location.Address;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
 import com.skobbler.ngx.navigation.SKNavigationSettings;
+import com.skobbler.ngx.routing.SKRouteSettings;
 
 /**
  * Created by ninasmacpro on 16/2/6.
@@ -28,11 +29,24 @@ public class MavigationApplication extends Application {
     private ApplicationPreferences appPrefs;
 
     /**
-     * object for the naviagation mode selection
+     * object for the naviagation Type selection
      */
     private SKNavigationSettings.SKNavigationType navigationType= SKNavigationSettings.SKNavigationType.SIMULATION;
 
     private Address desAddress = null;
+
+    /**
+     * object for the nivagintoin mode selection eg walking bus or drive
+     */
+    private SKRouteSettings.SKRouteMode skRouteMode = SKRouteSettings.SKRouteMode.CAR_FASTEST;
+
+    public SKRouteSettings.SKRouteMode getSkRouteMode() {
+        return skRouteMode;
+    }
+
+    public void setSkRouteMode(SKRouteSettings.SKRouteMode skRouteMode) {
+        this.skRouteMode = skRouteMode;
+    }
 
     public void setDesAddress(Address desAddress) {
         this.desAddress = desAddress;

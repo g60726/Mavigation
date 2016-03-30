@@ -478,7 +478,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                         // set the number of routes to be calculated
                         route.setNoOfRoutes(1);
                         // set the route mode
-                        route.setRouteMode(SKRouteSettings.SKRouteMode.CAR_FASTEST);
+                        route.setRouteMode(((MavigationApplication)getActivity().getApplication()).getSkRouteMode());
                         // set whether the route should be shown on the map after it's computed
                         route.setRouteExposed(true);
                         // set the route listener to be notified of route calculation

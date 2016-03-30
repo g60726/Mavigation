@@ -37,7 +37,7 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="22" />
-
+    <uses-library android:name="com.skobbler.ngx.map.SKMapViewHolder" />
     <application
         android:name=".MavigationApplication"
         android:allowBackup="true"
