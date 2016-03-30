@@ -225,7 +225,9 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         }
     }
 
-    // TODO: update mGroupOnParse,
+    // As long as you have mGroupObjectId, just call this function then it will grab
+    // everything you need for the group, as well as keep updating group information
+    // This function is being called by MyTimerTask
     public void updateEverythingAboutGroup() {
         // get Group object
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
@@ -263,7 +265,6 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                     mGroupOnParse = object;
                     // update Group object
                     updateGroup(newGroupMemberObjectId);
-                    //showGroupMemberOnMap();
                 } else {
                     // something went wrong
                 }
@@ -297,13 +298,13 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                             showGroupMembersLocation();
 
                             // schedule a timer to update group information
-                            if(mTimer != null){
+                            if (mTimer != null) {
                                 mTimer.cancel();
                                 mTimer = null;
                             }
                             mTimer = new Timer();
                             mTimerTask = new MyTimerTask(mTabActivity.getMapFragment());
-                            mTimer.schedule(mTimerTask, 1000, 3000); //delay 1000ms, repeat in 5000ms
+                            mTimer.schedule(mTimerTask, 1000, 3000); //delay 1000ms, repeat in 3000ms
                         }
                     });
                 } else {
@@ -312,7 +313,8 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             }
         });
     }
-    //send notification to all group members
+
+    // send notification to all new group members
     private void sendGroupRequest(String groupObjectId, ArrayList<String> newGroupMember){
         ParseQuery pushQuery = ParseInstallation.getQuery();
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
@@ -337,7 +339,23 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         }
     }
 
-    public void notificationUpdateGroup(String groupObjectId){
+    // Receiver of push notification from Parse.
+    public void notificationUpdateGroup(String groupObjectId) {
+        hasGroup = true;
+        mGroupObjectId = groupObjectId;
+        mParseUser.put("groupObjectId", mGroupObjectId);
+        mParseUser.saveInBackground();
+
+        updateEverythingAboutGroup();
+
+        // schedule a timer to update group information
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+        mTimer = new Timer();
+        mTimerTask = new MyTimerTask(mTabActivity.getMapFragment());
+        mTimer.schedule(mTimerTask, 1000, 3000); //delay 1000ms, repeat in 3000ms
         
     }
 
