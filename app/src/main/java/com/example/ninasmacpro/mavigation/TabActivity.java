@@ -71,7 +71,7 @@ public class TabActivity extends AppCompatActivity {
             if (extras != null) {
                 String groupObjectId = extras.getString("groupObjectId");
                 Log.i(" groupObjectId is: ", groupObjectId);
-
+                mMapFragment.notificationUpdateGroup(groupObjectId);
             }
         }
     };

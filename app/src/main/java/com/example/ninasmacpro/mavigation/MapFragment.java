@@ -142,9 +142,9 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
      */
     private boolean start = true;
     /*
-    destination cordinate creating by single tap
+    destination coordinate creating by single tap
      */
-    private SKCoordinate desCordinate = null;
+    private SKCoordinate desCoordinate = null;
     /*
     navigation button
      */
@@ -236,6 +236,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 if (e == null) {
                     mGroupOnParse = object;
                     mGroupMemberObjectId = new ArrayList<String>();
+                    mGroupName = mGroupOnParse.getString("groupName");
                     ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
                     try {
                         List<ParseUser> groupMember = temp.getQuery().find();
@@ -352,18 +353,14 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             mParseUser = ParseUser.getCurrentUser();
         }
 
+        mUserInfo = mParseUser.getParseObject("userInfo");
         mParseUser.put("groupObjectId", mGroupObjectId);
         mParseUser.saveInBackground();
 
-        mTabActivity = (TabActivity) this.getActivity();
-        /*
-        if (mTabActivity.getMessageFragment() == null) {
-            Log.w("asdklawjlksdf", "message fragment is null");
-        }
-        mTabActivity.getMessageFragment().startRetrievingGroupMessages(mGroupObjectId); //TODO: is this working?
-        */
-
         updateEverythingAboutGroup();
+
+        // start fetching group chat
+        mTabActivity.getMessageFragment().startRetrievingGroupMessages(mGroupObjectId);
 
         // schedule a timer to update group information
         if (mTimer != null) {
@@ -422,12 +419,6 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         mParseUser = ParseUser.getCurrentUser();
         mUserInfo = mParseUser.getParseObject("userInfo");
 
-        /*
-        if (mGroupObjectId != null) {
-            mParseUser.put("groupObjectId", mGroupObjectId);
-            mParseUser.saveInBackground();
-        }*/
-
         // check if user is in a group
         mGroupObjectId = (String) mParseUser.get("groupObjectId");
         if (mGroupObjectId != null && mGroupObjectId != "") {
@@ -444,6 +435,8 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                             mTimer = new Timer();
                             mTimerTask = new MyTimerTask(mTabActivity.getMapFragment());
                             mTimer.schedule(mTimerTask, 1000, 3000); //delay 1000ms, repeat in 3000ms
+
+                            mTabActivity.getMessageFragment().shouldStartRetrievingGroupMessages(mGroupObjectId);
 
                             mGroupName = mGroupOnParse.getString("groupName");
                             mGroupMemberObjectId = new ArrayList<String>();
@@ -492,7 +485,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             @Override
             public void onClick(View v) {
                 if (!navInProg && currentPosition != null) {
-                    if (desCordinate != null) {
+                    if (desCoordinate != null) {
                         if (textToSpeechEngine == null) {
                             Toast.makeText(getContext(), "Initializing TTS engine",
                                     Toast.LENGTH_LONG).show();
@@ -522,7 +515,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                         SKRouteSettings route = new SKRouteSettings();
                         // set start and destination points
                         route.setStartCoordinate(currentPosition.getCoordinate());
-                        route.setDestinationCoordinate(desCordinate);
+                        route.setDestinationCoordinate(desCoordinate);
                         // set the number of routes to be calculated
                         route.setNoOfRoutes(1);
                         // set the route mode
@@ -698,10 +691,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 result += " ";
             }
             searchButton.setText(result);
-            desCordinate = new SKCoordinate(desAddress.getLongitude(), desAddress.getLatitude());
+            desCoordinate = new SKCoordinate(desAddress.getLongitude(), desAddress.getLatitude());
             addCircle();
             if(mapView != null) {
-                mapView.centerMapOnPosition(desCordinate);
+                mapView.centerMapOnPosition(desCoordinate);
                 mapView.setZoom(17);
 
             }
@@ -727,7 +720,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     }
     private void addCircle(){
         SKCircle circle = new SKCircle();
-        circle.setCircleCenter(desCordinate);
+        circle.setCircleCenter(desCoordinate);
         float[] out = new float[4];
         out[0] = (float) 0.99;
         out[1] = (float) 0.553;
@@ -750,7 +743,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     @Override
     public void onSingleTap(SKScreenPoint skScreenPoint) {
         if(mapView!=null) {
-            desCordinate = mapView.pointToCoordinate(skScreenPoint);
+            desCoordinate = mapView.pointToCoordinate(skScreenPoint);
             addCircle();
         }
     }

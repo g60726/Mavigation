@@ -1,5 +1,6 @@
 package com.example.ninasmacpro.mavigation;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -47,8 +48,10 @@ public class MessageFragment extends Fragment {
     private EditText mMessageTextView;
 
     private TabActivity mTabActivity = null;
+    private boolean mShouldStartRetrievingGroupMessages = false;
     Timer mTimer;
     MessageTask mMessageTask;
+    Context mContext;
 
     public MessageFragment() {
         // Required empty public constructor
@@ -58,7 +61,8 @@ public class MessageFragment extends Fragment {
     // TODO: for later message, use push notification?
     public void getMessagesFromParse() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
-        query.whereEqualTo("objectId", mGroupObjectId);
+        //Log.w("get from Parse ", mGroupObjectId.toString());
+        query.whereEqualTo("groupObjectId", mGroupObjectId);
         query.orderByAscending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> messageList, ParseException e) {
@@ -67,6 +71,7 @@ public class MessageFragment extends Fragment {
                     mMessageContent.clear();
                     mMessageSender.clear();
                     for (ParseObject message: messageList) {
+                        Log.w("get from Parse", "there's something in the content!");
                         mMessageContent.add((String) message.get("content"));
                         mMessageSender.add((String) message.get("sender"));
                     }
@@ -79,6 +84,7 @@ public class MessageFragment extends Fragment {
     }
 
     private void displayMessages() {
+        /*
         mMessageSender.add("Nina"); // dummy values
         mMessageSender.add("Eric");
         mMessageSender.add("Carol");
@@ -95,20 +101,25 @@ public class MessageFragment extends Fragment {
         mMessageContent.add("soso");
         mMessageContent.add("good");
         mMessageContent.add("fine");
-        ArrayAdapter<String> currentGroupMemberAdapter = new ArrayAdapter<String>(getActivity(),
-                R.layout.message_list_layout, R.id.text3, mMessageSender) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                TextView text1 = (TextView) view.findViewById(R.id.text3);
-                TextView text2 = (TextView) view.findViewById(R.id.text4);
+        */
+        if (mContext != null) {
+            Log.w("context is not null", "success");
+            ArrayAdapter<String> currentGroupMemberAdapter = new ArrayAdapter<String>(mContext,
+                    R.layout.message_list_layout, R.id.text3, mMessageSender) {
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getView(position, convertView, parent);
+                    TextView text1 = (TextView) view.findViewById(R.id.text3);
+                    TextView text2 = (TextView) view.findViewById(R.id.text4);
 
-                text1.setText(mMessageSender.get(position));
-                text2.setText(mMessageContent.get(position));
-                return view;
-            }
-        };
-        mMessageListView.setAdapter(currentGroupMemberAdapter);
+                    text1.setText(mMessageSender.get(position));
+                    text2.setText(mMessageContent.get(position));
+                    return view;
+                }
+            };
+            mMessageListView.setAdapter(currentGroupMemberAdapter);
+        }
+
     }
 
     /**
@@ -135,7 +146,7 @@ public class MessageFragment extends Fragment {
 
         mTabActivity = (TabActivity) this.getActivity();
         mGroupObjectId = mTabActivity.getMapFragment().getGroupObjectId();
-        if (mGroupObjectId != null) {
+        if (mGroupObjectId != null || mShouldStartRetrievingGroupMessages == true) {
             startRetrievingGroupMessages(mGroupObjectId);
         }
 
@@ -144,6 +155,7 @@ public class MessageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mContext = getActivity();
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_message, container, false);
         mMessageListView = (ListView) rootView.findViewById(R.id.messageListView);
@@ -179,10 +191,13 @@ public class MessageFragment extends Fragment {
                 newMessage.put("content", messageContent);
                 newMessage.put("groupObjectId", mGroupObjectId);
                 newMessage.saveInBackground();
-                // TODO: Now, how to trigger Parse to send push notification?
-
             }
         });
+    }
+
+    public void shouldStartRetrievingGroupMessages(String groupObjectId) {
+        mGroupObjectId = groupObjectId;
+        mShouldStartRetrievingGroupMessages = true;
     }
 
     public void startRetrievingGroupMessages(String groupObjectId) {
