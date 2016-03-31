@@ -632,6 +632,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         // update ParseUser on Parse
         mGroupObjectId = null;
         mParseUser.put("groupObjectId", "");
+        mParseUser.put("isLeader", mIsLeader);
         mParseUser.saveInBackground();
 
         // update Group on Parse
