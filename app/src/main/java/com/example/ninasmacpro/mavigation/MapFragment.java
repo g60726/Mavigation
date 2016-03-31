@@ -313,7 +313,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                         public void done(ParseException e) {
                             mGroupObjectId = mGroupOnParse.getObjectId();
                             //send request
-                            sendGroupRequest(mGroupObjectId, newGroupMember);
+                            sendGroupRequest(mGroupObjectId, mGroupName, newGroupMember);
                             mParseUser.put("groupObjectId", mGroupObjectId);
                             mParseUser.saveInBackground();
                             showGroupMembersLocation();
@@ -336,13 +336,13 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     }
 
     // send notification to all new group members
-    private void sendGroupRequest(String groupObjectId, ArrayList<String> newGroupMember){
+    private void sendGroupRequest(String groupObjectId, String groupName, ArrayList<String> newGroupMember){
         ParseQuery pushQuery = ParseInstallation.getQuery();
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
         for (String contactObjectId: newGroupMember){
             if (!contactObjectId.equals(currentUserId) ){
                 pushQuery.whereEqualTo("user", contactObjectId);
-                String message = groupObjectId + " invites  you";
+                String message = "Group " + groupName + " invites  you";
                 try{
                     JSONObject data = new JSONObject();
                     data.put("alert", message);
