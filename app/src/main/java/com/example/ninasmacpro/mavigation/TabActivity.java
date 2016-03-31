@@ -93,50 +93,6 @@ public class TabActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        Bundle extras = getIntent().getExtras();
-//        if (extras != null) {
-//            Log.i("debug ", "intent comes from notification:");
-//            String groupObjectId = extras.getString("groupObjectId");
-//            mGroupObjectId = groupObjectId;
-//            if(mMapFragment != null) {
-//                mMapFragment.notificationUpdateGroup(groupObjectId);
-//            } else {
-//                needToGetNotification = true;
-//            }
-//
-//        }
-
-
-        //check activity
-//        try {
-//            Log.i("debug1", "check activity");
-//            Intent intent = getIntent();
-//            Bundle extras = intent.getExtras();
-//            if (extras != null) {
-//                Log.i("debug2", "extras is not null");
-//                String jsonData = extras.getString("com.parse.Data");
-//                JSONObject json;
-//                json = new JSONObject(jsonData);
-//                String pushStore = json.getString("alert");
-////                data.setText(pushStore);
-//                if(pushStore!=null) {
-//                    Log.i("debug3", "start new activity");
-//
-//                    Intent pushIntent = new Intent(TabActivity.this, SearchFriendActivity.class);
-////                    pushIntent.setClassName(TabActivity.this, "package.name.List");
-//                    pushIntent.putExtra("store", pushStore);
-//                    startActivity(pushIntent);
-//                }
-//            }
-//
-//        } catch (JSONException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-
-
-
-
         setContentView(R.layout.activity_tab);
 
         requestPermissions();
@@ -365,10 +321,6 @@ public class TabActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     // Top Rated fragment activity
-
-                    if (needToGetNotification) {
-                        mMapFragment.notificationUpdateGroup(mGroupObjectId);
-                    }
                     return mMapFragment;
                 case 1:
                     // Games fragment activity

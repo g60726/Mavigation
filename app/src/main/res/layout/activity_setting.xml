@@ -59,7 +59,7 @@
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hide Me"
+            android:text="Hide me"
             android:id="@+id/hideEmailSwitch"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"

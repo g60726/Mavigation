@@ -101,6 +101,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     private TabActivity mTabActivity = null;
     Timer mTimer;
     MyTimerTask mTimerTask;
+    private boolean mIsLeader = true; // true so we can search
 
     public MapFragment() {
         // Required empty public constructor
@@ -192,8 +193,10 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_CREATE_GROUP) {
             if (Activity.RESULT_OK == resultCode) {
-                // Grab whatever data identifies that car that was sent in
-                // setResult(int, Intent)
+                mIsLeader = true;
+                mParseUser.put("isLeader", mIsLeader);
+                mParseUser.saveInBackground();
+
                 hasGroup = true;
                 Bundle bundle = data.getExtras();
                 mGroupName = bundle.getString("groupName");
@@ -239,6 +242,19 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     mGroupOnParse = object;
+
+                    // get destination
+                    Double latitude = mGroupOnParse.getDouble("destLatitude");
+                    Double longitude = mGroupOnParse.getDouble("destLongitude");
+                    if (latitude != null && longitude != null) {
+                        if (navInProg && (desCoordinate.getLatitude() != latitude || desCoordinate.getLongitude() != longitude)) {
+                            stopNavigtion();
+                        }
+                        desCoordinate = new SKCoordinate(longitude, latitude);
+                        updateDestination();
+                        addCircle();
+                    }
+
                     mGroupMemberObjectId = new ArrayList<String>();
                     mGroupName = mGroupOnParse.getString("groupName");
                     ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
@@ -353,17 +369,22 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         hasGroup = true;
         mGroupObjectId = groupObjectId;
 
+
+
         if (mParseUser == null) {
             mParseUser = ParseUser.getCurrentUser();
         }
 
         mUserInfo = mParseUser.getParseObject("userInfo");
+        mIsLeader = false;
+        mParseUser.put("isLeader", mIsLeader);
         mParseUser.put("groupObjectId", mGroupObjectId);
         mParseUser.saveInBackground();
 
         updateEverythingAboutGroup();
 
         // start fetching group chat
+        mTabActivity.getMessageFragment().setTabActivity(mTabActivity);
         mTabActivity.getMessageFragment().startRetrievingGroupMessages(mGroupObjectId);
 
         // schedule a timer to update group information
@@ -375,6 +396,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         mTimer = new Timer();
         mTimerTask = new MyTimerTask(mTabActivity.getMapFragment());
         mTimer.schedule(mTimerTask, 1000, 3000); //delay 1000ms, repeat in 3000ms
+
         
     }
 
@@ -421,6 +443,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
 
         // get current Parse user and its pointer to user info
         mParseUser = ParseUser.getCurrentUser();
+        mIsLeader = mParseUser.getBoolean("isLeader");
         mUserInfo = mParseUser.getParseObject("userInfo");
 
         // check if user is in a group
@@ -435,6 +458,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                             mGroupOnParse = object;
                             showGroupMembersLocation(); // since mapView may not have been initialized yet, this may not do anything at all
                             hasGroup = true;
+
 
                             mTimer = new Timer();
                             mTimerTask = new MyTimerTask(mTabActivity.getMapFragment());
@@ -548,8 +572,11 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AdressSearch.class);
-                startActivity(intent);
+                if (mIsLeader == true) { // only a leader can do a search
+                    Intent intent = new Intent(getActivity(), AdressSearch.class);
+                    startActivity(intent);
+                }
+
             }
         });
         //set geocoder
@@ -560,21 +587,30 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         currentPositionProvider.requestLocationUpdates(Utils.hasGpsModule(getActivity()), Utils.hasNetworkModule(getActivity()), false);
         return rootView;
     }
+
     // update destination
-    private void updateDestination(){
+    private void updateDestination() {
         try {
-            Address address = geocoder.getFromLocation(desCoordinate.getLatitude(), desCoordinate.getLongitude(), 1).get(0);
-            String result = "";
-            for (int i = 0;i< address.getMaxAddressLineIndex();i++){
-                result+=address.getAddressLine(i);
-                result+=" ";
+            List<Address> temp = geocoder.getFromLocation(desCoordinate.getLatitude(), desCoordinate.getLongitude(), 1);
+            if (!temp.isEmpty()) {
+                Address address = temp.get(0);
+                String result = "";
+                for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                    result+=address.getAddressLine(i);
+                    result+=" ";
+                }
+                if (getActivity() != null) {
+                    ((MavigationApplication)getActivity().getApplication()).setDesAddress(address);
+                    searchButton.setText(result);
+                }
+
             }
-            ((MavigationApplication)getActivity().getApplication()).setDesAddress(address);
-            searchButton.setText(result);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     public void leaveCurrentGroup() {
         // stop updating group info
         if (mTimer!= null) {
@@ -589,6 +625,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         }
 
         hasGroup = false;
+        mIsLeader = true; // on my own then I'm a leader of myself
         mGroupName = null;
         mGroupMemberObjectId = null;
 
@@ -716,7 +753,12 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
             if(mapView != null) {
                 mapView.centerMapOnPosition(desCoordinate);
                 mapView.setZoom(17);
+            }
 
+            if (hasGroup) { // only leader can set new destination and upload it to Parse
+                mGroupOnParse.put("destLatitude", desAddress.getLatitude());
+                mGroupOnParse.put("destLongitude", desAddress.getLongitude());
+                mGroupOnParse.saveInBackground();
             }
         }
     }
@@ -763,9 +805,18 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     @Override
     public void onSingleTap(SKScreenPoint skScreenPoint) {
         if(mapView!=null) {
-            desCoordinate = mapView.pointToCoordinate(skScreenPoint);
-            updateDestination();
-            addCircle();
+            if (mIsLeader == true) {
+                desCoordinate = mapView.pointToCoordinate(skScreenPoint);
+                updateDestination();
+                addCircle();
+
+                if (hasGroup) { // only leader can set new destination and upload it to Parse
+                    mGroupOnParse.put("destLatitude", desCoordinate.getLatitude());
+                    mGroupOnParse.put("destLongitude", desCoordinate.getLongitude());
+                    mGroupOnParse.saveInBackground();
+                }
+            }
+
         }
     }
 

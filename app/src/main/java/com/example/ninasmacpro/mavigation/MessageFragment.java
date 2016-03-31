@@ -200,6 +200,10 @@ public class MessageFragment extends Fragment {
         mShouldStartRetrievingGroupMessages = true;
     }
 
+    public void setTabActivity(TabActivity tabActivity) {
+        mTabActivity = tabActivity;
+    }
+
     public void startRetrievingGroupMessages(String groupObjectId) {
         mGroupObjectId = groupObjectId;
 
