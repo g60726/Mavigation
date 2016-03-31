@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 
 import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
@@ -58,6 +59,7 @@ import com.skobbler.ngx.routing.SKRouteSettings;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -167,6 +169,8 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     search button
      */
     private Button searchButton;
+    // geocoder
+    private Geocoder geocoder;
     /** the "+" button on map fragment */
     // TODO: add this to ParseCurrentUser
     public void onButtonGroup() {
@@ -548,13 +552,29 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                 startActivity(intent);
             }
         });
+        //set geocoder
+        geocoder = new Geocoder(getContext(),Locale.getDefault());
         //set current position
         currentPositionProvider = new SKCurrentPositionProvider(getActivity());
         currentPositionProvider.setCurrentPositionListener(this);
         currentPositionProvider.requestLocationUpdates(Utils.hasGpsModule(getActivity()), Utils.hasNetworkModule(getActivity()), false);
         return rootView;
     }
-
+    // update destination
+    private void updateDestination(){
+        try {
+            Address address = geocoder.getFromLocation(desCoordinate.getLatitude(), desCoordinate.getLongitude(), 1).get(0);
+            String result = "";
+            for (int i = 0;i< address.getMaxAddressLineIndex();i++){
+                result+=address.getAddressLine(i);
+                result+=" ";
+            }
+            ((MavigationApplication)getActivity().getApplication()).setDesAddress(address);
+            searchButton.setText(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void leaveCurrentGroup() {
         // stop updating group info
         if (mTimer!= null) {
@@ -744,6 +764,7 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
     public void onSingleTap(SKScreenPoint skScreenPoint) {
         if(mapView!=null) {
             desCoordinate = mapView.pointToCoordinate(skScreenPoint);
+            updateDestination();
             addCircle();
         }
     }
