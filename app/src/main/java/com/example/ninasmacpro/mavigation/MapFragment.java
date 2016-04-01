@@ -420,7 +420,9 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
                         try {
                             Double longitude = userInfo.fetchIfNeeded().getDouble("longitude");
                             Double latitude = userInfo.fetchIfNeeded().getDouble("latitude");
-                            addAnnotation(userNickName, new SKCoordinate(longitude, latitude), count);
+                            Double estimationTime = userInfo.fetchIfNeeded().getDouble("estimationTime");
+                            String text = userNickName + " (" + estimationTime.toString() + " hr)";
+                            addAnnotation(text, new SKCoordinate(longitude, latitude), count);
                         } catch (ParseException e2) {
                             e2.printStackTrace();
                         }
