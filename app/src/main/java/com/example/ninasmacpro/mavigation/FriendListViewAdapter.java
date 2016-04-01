@@ -170,7 +170,7 @@ public class FriendListViewAdapter extends BaseAdapter {
     private void sendFriendRequest(String contactObjectId, String username, String contactEmail){
         ParseQuery pushQuery = ParseInstallation.getQuery();
         pushQuery.whereEqualTo("user", contactObjectId);
-        String message = username + " want to add you";
+        String message = username + " added you";
         try{
             JSONObject data = new JSONObject();
             data.put("alert", message);
