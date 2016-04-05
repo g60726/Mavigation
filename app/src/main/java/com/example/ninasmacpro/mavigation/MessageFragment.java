@@ -167,9 +167,9 @@ public class MessageFragment extends Fragment {
             getMessagesFromParse();
             checkSendButtonClick(rootView); // send button only work if the user is in a group
         } else { // FIXME: delete this part in real usage
-            Log.w("dummy one", "success");
-            displayMessages();
-            checkSendButtonClick(rootView);
+            //Log.w("dummy one", "success");
+            //displayMessages();
+            //checkSendButtonClick(rootView);
         }
 
         return rootView;
@@ -213,7 +213,7 @@ public class MessageFragment extends Fragment {
         }
         mTimer = new Timer();
         mMessageTask = new MessageTask(mTabActivity.getMessageFragment());
-        mTimer.schedule(mMessageTask, 1000, 3000); //delay 1000ms, repeat in 3000ms
+        mTimer.schedule(mMessageTask, 1000, 1000); //delay 1000ms, repeat in 1000ms
 
     }
 

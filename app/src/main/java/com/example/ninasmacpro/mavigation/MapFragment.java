@@ -408,32 +408,44 @@ public class MapFragment extends Fragment implements SKMapSurfaceListener, SKCur
         mapPopup.hide();
 
         // update group member's location on map
-        ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
-        try {
-            List<ParseUser> groupMember = temp.getQuery().find();
-            int count = 1;
-            for (ParseUser temp2: groupMember) {
-                if (temp2.getObjectId() != mParseUser.getObjectId()) {
-                    ParseObject userInfo = temp2.getParseObject("userInfo");
-                    String userNickName =  (String) temp2.get("nickName");
-                    if (userInfo != null) {
-                        try {
-                            Double longitude = userInfo.fetchIfNeeded().getDouble("longitude");
-                            Double latitude = userInfo.fetchIfNeeded().getDouble("latitude");
-                            Double estimationTime = userInfo.fetchIfNeeded().getDouble("estimationTime");
-                            String text = userNickName + " (" + estimationTime.toString() + " hr)";
-                            addAnnotation(text, new SKCoordinate(longitude, latitude), count);
-                        } catch (ParseException e2) {
-                            e2.printStackTrace();
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
+        query.getInBackground(mGroupObjectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    mGroupOnParse = object;
+                    ParseRelation<ParseUser> temp = mGroupOnParse.getRelation("members");
+                    try {
+                        List<ParseUser> groupMember = temp.getQuery().find();
+                        int count = 1;
+                        for (ParseUser temp2: groupMember) {
+                            if (temp2.getObjectId() != mParseUser.getObjectId()) {
+                                ParseObject userInfo = temp2.getParseObject("userInfo");
+                                String userNickName =  (String) temp2.get("nickName");
+                                if (userInfo != null) {
+                                    try {
+                                        Double longitude = userInfo.fetchIfNeeded().getDouble("longitude");
+                                        Double latitude = userInfo.fetchIfNeeded().getDouble("latitude");
+                                        Double estimationTime = userInfo.fetchIfNeeded().getDouble("estimationTime");
+                                        String text = userNickName + " (" + estimationTime.toString() + " hr)";
+                                        addAnnotation(text, new SKCoordinate(longitude, latitude), count);
+                                    } catch (ParseException e2) {
+                                        e2.printStackTrace();
+                                    }
+
+                                }
+                                count++;
+                            }
                         }
+                    } catch (ParseException e2) {
 
                     }
-                    count++;
-                }
-            }
-        } catch (ParseException e2) {
+                } else {
 
-        }
+                }
+                }
+        });
+
+
     }
 
 

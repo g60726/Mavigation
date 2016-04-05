@@ -138,6 +138,7 @@ public class SignUpActivity extends AppCompatActivity {
             user.setPassword(password);
             user.put("nickName", nickName);
             user.put("hideEmail", false);
+            user.put("isLeader", true);
             //create user info object
 
 
